@@ -1,4 +1,3 @@
-const { type } = require("firebase/firestore/pipelines");
 const mongoose = require("mongoose");
 const Internshipschema = new mongoose.Schema({
   title: String,
