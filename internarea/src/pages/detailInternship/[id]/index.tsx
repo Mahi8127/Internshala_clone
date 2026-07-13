@@ -85,7 +85,7 @@ const index = () => {
     const fetchdata = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/internship/${id}`,
+          `https://internshala-clone-6qrv.onrender.com/api/internship/${id}`,
         );
         setinternship(res.data);
       } catch (error) {
@@ -127,7 +127,7 @@ const index = () => {
         availability,
       };
       await axios.post(
-        "http://localhost:5000/api/application",
+        "https://internshala-clone-6qrv.onrender.com/api/application",
         applicationdata,
       );
       toast.success("Application submit successfully");

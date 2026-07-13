@@ -54,7 +54,7 @@ const index = () => {
     try {
       setisloading(true);
 
-      const res = await axios.post("http://localhost:5000/api/job", formData);
+      const res = await axios.post("https://internshala-clone-6qrv.onrender.com/api/job", formData);
 
       toast.success("Job posted successfully");
 
