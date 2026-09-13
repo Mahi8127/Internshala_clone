@@ -18,16 +18,22 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [loading, setLoading] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
 
-    if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+    if (
+      !file.type.startsWith("image/") &&
+      !file.type.startsWith("video/")
+    ) {
       toast.error("Please select an image or video");
       return;
     }
@@ -60,22 +66,29 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
 
     try {
       setLoading(true);
+
       const formData = new FormData();
 
       formData.append("userId", currentUserId);
       formData.append("caption", caption.trim());
       formData.append("media", selectedFile);
 
-      const response = await fetch("http://localhost:5000/api/posts/create", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/posts/create",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
-      console.log("CREATE POST RESPONSE: ", data);
+
+      console.log("CREATE POST RESPONSE:", data);
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to create post.");
+        // Show the actual backend message.
+        toast.error(data.message || "Failed to create post.");
+        return;
       }
 
       toast.success("Post created successfully");
@@ -85,9 +98,11 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
 
       onPostCreated();
     } catch (error: any) {
-      console.error("Create post error: ", error);
+      console.error("Create post error:", error);
 
-      toast.error("Failed to create post. ");
+      toast.error(
+        error?.message || "Unable to connect to the server."
+      );
     } finally {
       setLoading(false);
     }
@@ -95,7 +110,10 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-      <h2 className="text-lg font-semibold text-gray-900">Create a Post</h2>
+      <h2 className="text-lg font-semibold text-gray-900">
+        Create a Post
+      </h2>
+
       <p className="text-sm text-gray-500 mt-1 mb-5">
         Share something with the community.
       </p>
@@ -114,11 +132,12 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-2 px-4 py--2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
         >
           <Image size={18} />
           Photo / Video
         </button>
+
         <input
           type="file"
           ref={fileInputRef}
@@ -138,6 +157,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
           >
             <X size={18} />
           </button>
+
           {selectedFile.type.startsWith("video/") ? (
             <video
               src={previewUrl}
@@ -157,14 +177,20 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
       {/* Selected File */}
       {selectedFile && (
         <p className="text-xs text-gray-500 mt-2 truncate">
-          {selectedFile?.name}
+          {selectedFile.name}
         </p>
       )}
 
       {/* Post Button */}
-      <button type="button" onClick={handleCreatePost} disabled={loading} className="w-full mt-5 flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-white py-3 font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
-        <Send size={18}/>
-        {loading ? "Posting...":"Post"}
+      <button
+        type="button"
+        onClick={handleCreatePost}
+        disabled={loading}
+        className="w-full mt-5 flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-white py-3 font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <Send size={18} />
+
+        {loading ? "Posting..." : "Post"}
       </button>
     </div>
   );

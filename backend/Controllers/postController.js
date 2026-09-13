@@ -6,6 +6,13 @@ const createPost = async (req, res) => {
   try {
     const { userId, caption } = req.body;
 
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required.",
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -22,17 +29,21 @@ const createPost = async (req, res) => {
       });
     }
 
+    // Count only accepted friendships.
+    // A friendship document contains the user either as sender or receiver.
     const friendCount = await Friend.countDocuments({
       status: "accepted",
       $or: [{ sender: userId }, { receiver: userId }],
     });
 
+    // Get today's date range.
     const start = new Date();
     start.setHours(0, 0, 0, 0);
 
     const end = new Date();
     end.setHours(23, 59, 59, 999);
 
+    // Count how many posts this user has already created today.
     const todayPosts = await Post.countDocuments({
       user: userId,
       createdAt: {
@@ -41,6 +52,17 @@ const createPost = async (req, res) => {
       },
     });
 
+    /*
+      DAILY POSTING RULES
+
+      0 friends       -> 0 posts
+      1 friend        -> 1 post/day
+      2 friends       -> 2 posts/day
+      3-10 friends    -> 3 posts/day
+      >10 friends     -> unlimited
+    */
+
+    // No friends = cannot post
     if (friendCount === 0) {
       return res.status(400).json({
         success: false,
@@ -48,6 +70,7 @@ const createPost = async (req, res) => {
       });
     }
 
+    // 1 friend = 1 post/day
     if (friendCount === 1 && todayPosts >= 1) {
       return res.status(400).json({
         success: false,
@@ -55,12 +78,24 @@ const createPost = async (req, res) => {
       });
     }
 
+    // 2 friends = 2 posts/day
     if (friendCount === 2 && todayPosts >= 2) {
       return res.status(400).json({
         success: false,
-        message: "Daily limit reached (2 post).",
+        message: "Daily limit reached (2 posts).",
       });
     }
+
+    // 3-10 friends = 3 posts/day
+    if (friendCount >= 3 && friendCount <= 10 && todayPosts >= 3) {
+      return res.status(400).json({
+        success: false,
+        message: "Daily limit reached (3 posts).",
+      });
+    }
+
+    // More than 10 friends = unlimited posts.
+    // No limit check is required.
 
     let mediaType = "image";
 
@@ -231,10 +266,14 @@ const likeUnlikePost = async (req, res) => {
       });
     }
 
-    const alreadyLiked = post.likes.some((id) => id.toString() === userId);
+    const alreadyLiked = post.likes.some(
+      (id) => id.toString() === userId
+    );
 
     if (alreadyLiked) {
-      post.likes = post.likes.filter((id) => id.toString() !== userId);
+      post.likes = post.likes.filter(
+        (id) => id.toString() !== userId
+      );
 
       await post.save();
 
@@ -317,7 +356,7 @@ const getComment = async (req, res) => {
 
     const post = await Post.findById(postId).populate(
       "comments.user",
-      "name email profilePhoto",
+      "name email profilePhoto"
     );
 
     if (!post) {
@@ -461,7 +500,7 @@ const getSharedPosts = async (req, res) => {
       posts,
     });
   } catch (error) {
-    console.error("Get Shared Posts Error:", error);
+    console.error("Get Shared Posts Error: ", error);
 
     return res.status(500).json({
       success: false,

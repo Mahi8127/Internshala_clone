@@ -1,23 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { auth, provider } from "../firebase/firebase";
-import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Search, Users } from "lucide-react";
 import { signInWithPopup, signOut } from "firebase/auth";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { selectuser } from "@/Feature/Userslice";
-import { logout } from "@/Feature/Userslice";
-import { UseDispatch } from "react-redux";
-
-interface User {
-  name: string;
-  email: string;
-  photo: string;
-}
+import { selectuser, logout } from "@/Feature/Userslice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectuser);
+
   const handlelogin = async () => {
     try {
       await signInWithPopup(auth, provider);
@@ -26,79 +19,113 @@ const Navbar = () => {
       console.error(error);
       toast.error("Login failed");
     }
-
-    // setUser({
-    //   name: "Rahul",
-    //   email: "xyz@gmail.com",
-    //   photo:
-    //     "http://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=faces,",
-    // });
   };
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
     dispatch(logout());
+
     toast.success("Logged out successfully");
+
     window.location.href = "/";
   };
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     if (
-  //       dropdownRef.current &&
-  //       !dropdownRef.current.contains(event.target as Node)
-  //     ) {
-  //       setIsProfileDropdown(false);
-  //     }
-  //   };
-  //   document.addEventListener("mousedown", handleClickOutside);
 
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
-  console.log("Redux User: ", user);
   return (
     <div className="relative">
-      <nav className="bg-white shadow-md">
+      <nav className="bg-white shadow-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            {/* Logo */}
+
+            {/* ================= LOGO ================= */}
             <div className="flex shrink-0">
-              <a href="/" className="text-xl font-bold text-blue-600">
-                <img src="/logo.png" alt="logo" className="h-16" />
-              </a>
+              <Link
+                href="/"
+                className="flex items-center"
+              >
+                <img
+                  src="/logo.png"
+                  alt="logo"
+                  className="h-16 w-auto object-contain"
+                />
+              </Link>
             </div>
 
-            {/* Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600">
-                <Link href="/internship">Internships</Link>
-              </button>
+            {/* ================= NAVIGATION ================= */}
+            <div className="hidden md:flex items-center space-x-7">
 
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600">
-                <Link href="/job">Jobs</Link>
-              </button>
+              {/* Internships */}
+              <Link
+                href="/internship"
+                className="relative text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 group"
+              >
+                Internships
 
-              <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
-                <Search size={16} className="text-gray-600" />
+                <span className="absolute left-0 -bottom-2 w-0 h-0.5 bg-blue-600 transition-all duration-200 group-hover:w-full"></span>
+              </Link>
+
+              {/* Jobs */}
+              <Link
+                href="/job"
+                className="relative text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 group"
+              >
+                Jobs
+
+                <span className="absolute left-0 -bottom-2 w-0 h-0.5 bg-blue-600 transition-all duration-200 group-hover:w-full"></span>
+              </Link>
+
+              {/* ================= PUBLIC SPACE ================= */}
+              <Link
+                href="/public-space"
+                className="group flex items-center gap-2 px-4 py-2 rounded-full text-gray-700 font-semibold transition-all duration-200 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <Users
+                  size={17}
+                  className="text-gray-500 group-hover:text-blue-600 transition-colors duration-200"
+                />
+
+                <span>Public Space</span>
+              </Link>
+
+              {/* ================= PLANS ================= */}
+              {user && (
+                <Link
+                  href="/subscription"
+                  className="px-4 py-2 rounded-full bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  Plans
+                </Link>
+              )}
+
+              {/* ================= SEARCH ================= */}
+              <div className="flex items-center bg-gray-100 border border-transparent rounded-full px-4 py-2.5 focus-within:bg-white focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all duration-200">
+                <Search
+                  size={17}
+                  className="text-gray-500"
+                />
 
                 <input
                   type="text"
                   placeholder="Search opportunities..."
-                  className="ml-2 w-48 bg-transparent text-black placeholder:text-gray-500 focus:outline-none"
+                  className="ml-2 w-44 bg-transparent text-black placeholder:text-gray-500 focus:outline-none text-sm"
                 />
               </div>
             </div>
 
-            {/* Auth Buttons */}
+            {/* ================= AUTH BUTTONS ================= */}
             <div className="flex items-center space-x-4">
+
               {user ? (
                 <div className="flex items-center gap-3">
+
+                  {/* Profile */}
                   <Link href="/profile">
                     {user.photo ? (
                       <img
@@ -113,39 +140,45 @@ const Navbar = () => {
                     )}
                   </Link>
 
+                  {/* Logout */}
                   <button
                     onClick={handleLogout}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium shadow hover:bg-red-600 transition duration-200"
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium shadow-sm hover:bg-red-600 hover:shadow-md transition-all duration-200"
                   >
                     Logout
                   </button>
+
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
-                  <>
-                    <Link
-                      href="/login"
-                      className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                      Sign In
-                    </Link>
 
-                    <Link
-                      href="/register"
-                      className="px-6 py-2.5 rounded-xl border border-blue-600 text-blue-600 bg-white font-semibold shadow-sm hover:bg-blue-600 hover:text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                      Register
-                    </Link>
+                  {/* Sign In */}
+                  <Link
+                    href="/login"
+                    className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  >
+                    Sign In
+                  </Link>
 
-                    <Link
-                      href="/adminlogin"
-                      className="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-700 bg-white font-semibold shadow-md hover:bg-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                      Admin
-                    </Link>
-                  </>
+                  {/* Register */}
+                  <Link
+                    href="/register"
+                    className="px-6 py-2.5 rounded-xl border border-blue-600 text-blue-600 bg-white font-semibold shadow-sm hover:bg-blue-600 hover:text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  >
+                    Register
+                  </Link>
+
+                  {/* Admin */}
+                  <Link
+                    href="/adminlogin"
+                    className="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-700 bg-white font-semibold shadow-md hover:bg-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                  >
+                    Admin
+                  </Link>
+
                 </div>
               )}
+
             </div>
           </div>
         </div>
@@ -153,4 +186,5 @@ const Navbar = () => {
     </div>
   );
 };
+
 export default Navbar;
