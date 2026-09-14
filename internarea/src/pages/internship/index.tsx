@@ -1,57 +1,25 @@
 import axios from "axios";
 import {
   ArrowUpRight,
-  Calculator,
-  Calendar,
-  Clock,
   DollarSign,
   Filter,
-  Pin,
+  Clock,
   PlayCircle,
-  Pointer,
   X,
+  Search,
+  MapPin,
+  SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 
 import React, { useEffect, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
-// const internshipData = [
-//   {
-//     _id: "1",
-//     title: "Frontend Developer Intern",
-//     company: "TechCorp",
-//     StartDate: "April 2025",
-//     Duration: "3 Months",
-//     stipend: "$500/month",
-//     category: "Web Development",
-//     location: "New York",
-//   },
-//   {
-//     _id: "2",
-//     title: "Data Science Intern",
-//     company: "DataTech",
-//     StartDate: "May 2025",
-//     Duration: "6 Months",
-//     stipend: "$800/month",
-//     category: "Data Science",
-//     location: "San Francisco",
-//   },
-//   {
-//     _id: "3",
-//     title: "Marketing Intern",
-//     company: "MarketPro",
-//     StartDate: "June 2025",
-//     Duration: "4 Months",
-//     stipend: "$400/month",
-//     category: "Marketing",
-//     location: "Los Angeles",
-//   },
-// ];
 
-const index = () => {
-  const [filteredInternship, setfilteredInternship] = useState<any>([]);
-  const [isFiltervisible, setisFiltervisible] = useState(false);
-  const [filter, setfilters] = useState({
+const Index = () => {
+  const [filteredInternship, setFilteredInternship] = useState<any[]>([]);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+
+  const [filter, setFilters] = useState({
     category: "",
     location: "",
     workFromHome: false,
@@ -59,40 +27,63 @@ const index = () => {
     stipend: 50,
   });
 
-  const [internshipData, setinternship] = useState<any>([]);
+  const [internshipData, setInternship] = useState<any[]>([]);
+
+  /* ================= FETCH INTERNSHIPS ================= */
+
   useEffect(() => {
-    const fetchdata = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/internship");
-        setinternship(res.data);
-        setfilteredInternship(res.data);
+        const res = await axios.get(
+          "http://localhost:5000/api/internship"
+        );
+
+        setInternship(res.data);
+        setFilteredInternship(res.data);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchdata();
+
+    fetchData();
   }, []);
+
+  /* ================= FILTER ================= */
+
   useEffect(() => {
-    const filtered = internshipData.filter((internship:any) => {
-      const matchesCategory = internship.category
+    const filtered = internshipData.filter((internship: any) => {
+      const category = internship.category || "";
+      const location = internship.location || "";
+
+      const matchesCategory = category
         .toLowerCase()
         .includes(filter.category.toLowerCase());
-      const matchesLocation = internship.location
+
+      const matchesLocation = location
         .toLowerCase()
         .includes(filter.location.toLowerCase());
+
       return matchesCategory && matchesLocation;
     });
-    setfilteredInternship(filtered);
+
+    setFilteredInternship(filtered);
   }, [filter, internshipData]);
-  const handlefilterchange = (e: any) => {
+
+  /* ================= FILTER CHANGE ================= */
+
+  const handleFilterChange = (e: any) => {
     const { name, value, type, checked } = e.target;
-    setfilters((prev) => ({
+
+    setFilters((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
+  /* ================= CLEAR FILTERS ================= */
+
   const clearFilters = () => {
-    setfilters({
+    setFilters({
       category: "",
       location: "",
       workFromHome: false,
@@ -100,262 +91,771 @@ const index = () => {
       stipend: 50,
     });
   };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Filter */}
-          <div className="hidden md:block w-64 bg-white rounded-lg shadow-sm p-6 h-fit">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-2">
-                <Filter className="h-5 w-5 text-blue-600" />
-                <span className="font-medium text-black">Filters</span>
-              </div>
-              <button
-                onClick={clearFilters}
-                className="text-sm text-blue-600 hover:text-blue-800"
-              >
-                Clear all
-              </button>
+    <div className="min-h-screen bg-slate-50">
+
+      {/* ================= PAGE HEADER ================= */}
+
+      <section className="border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
+
+          <div className="max-w-3xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
+              <Search size={14} />
+              Find your next opportunity
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  name="category"
-                  value={filter.category}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. Marketing Intern"
-                />
-              </div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Find the right internship for you
+            </h1>
 
-              {/* location filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  name="location"
-                  value={filter.location}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. Mumbai"
-                />
-              </div>
-
-              {/* checkbox */}
-              <div className="space-y-3">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="workFromHome"
-                    checked={filter.workFromHome}
-                    onChange={handlefilterchange}
-                    className="h-4 w-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-700">Work From Home</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="partTime"
-                    checked={filter.partTime}
-                    onChange={handlefilterchange}
-                    className="h-4 w-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-700">Part-time</span>
-                </label>
-              </div>
-
-              {/* stipen range */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Monthly Stipend (₹)
-                </label>
-                <input
-                  type="range"
-                  name="stipend"
-                  min="0"
-                  max="100"
-                  value={filter.stipend}
-                  onChange={handlefilterchange}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>₹0</span>
-                  <span>₹50K</span>
-                  <span>₹100K</span>
-                </div>
-              </div>
-            </div>
+            <p className="mt-2 text-sm leading-6 text-slate-500 sm:text-base">
+              Explore internships from different companies and find
+              opportunities that match your skills and interests.
+            </p>
           </div>
-          <div className="flex-1">
-            <div className="md:hidden mb-4">
-              <button
-                onClick={() => setisFiltervisible(!isFiltervisible)}
-                className="w-full flex items-center justify-center space-x-2 bg-white p-3 rounded-lg shadow-sm text-black"
-              >
-                <Filter className="h-5 w-5" />
-                <span>Show Filters</span>
-              </button>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-              <p className="text-center font-medium text-black">
-                {filteredInternship.length} internships found
-              </p>
-            </div>
-            <div className="space-y-4">
-              {filteredInternship.map((internship: any) => (
-                <div
-                  key={internship._id}
-                  className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+
+        </div>
+      </section>
+
+      {/* ================= MAIN CONTENT ================= */}
+
+      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+
+        <div className="flex flex-col gap-6 lg:flex-row">
+
+          {/* ================= DESKTOP FILTER ================= */}
+
+          <aside className="hidden w-64 shrink-0 lg:block">
+
+            <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+
+              {/* Filter Header */}
+
+              <div className="mb-6 flex items-center justify-between">
+
+                <div className="flex items-center gap-2">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50">
+                    <Filter
+                      size={18}
+                      className="text-blue-600"
+                    />
+                  </div>
+
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-900">
+                      Filters
+                    </h2>
+
+                    <p className="text-xs text-slate-400">
+                      Refine results
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={clearFilters}
+                  className="text-xs font-semibold text-blue-600 transition hover:text-blue-800"
                 >
-                  <div className="flex items-center space-x-2 text-blue-600 mmb-4">
-                    <ArrowUpRight className="h-5 w-5" />
-                    <span className="font-medium">Actively Hiring</span>
+                  Clear
+                </button>
+              </div>
+
+              <div className="space-y-6">
+
+                {/* Category */}
+
+                <div>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Category
+                  </label>
+
+                  <div className="relative">
+                    <Search
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+
+                    <input
+                      type="text"
+                      name="category"
+                      value={filter.category}
+                      onChange={handleFilterChange}
+                      placeholder="e.g. Marketing"
+                      className="
+                        w-full rounded-xl
+                        border border-gray-200
+                        bg-gray-50
+                        py-2.5 pl-9 pr-3
+                        text-sm text-slate-700
+                        outline-none
+                        transition
+                        placeholder:text-slate-400
+                        focus:border-blue-400
+                        focus:bg-white
+                        focus:ring-4
+                        focus:ring-blue-50
+                      "
+                    />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    {internship.title}
-                  </h2>
-                  <p className="text-gray-600 mb-4">{internship.company}</p>
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <PlayCircle className="h-5 w-5" />
-                      <div>
-                        <p className="text-sm font-medium">Start Date</p>
-                        <p className="text-sm">{internship.startDate}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <FaLocationDot  className="h-5 w-5" />
-                      <div>
-                        <p className="text-sm font-medium">Location: </p>
-                        <p className="text-sm">{internship.location}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <DollarSign className="h-5 w-5" />
-                      <p className="text-sm font-medium">Stipend: </p>
-                      <p className="text-sm">{internship.stipend}</p>
-                    </div>
+                </div>
+
+                {/* Location */}
+
+                <div>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Location
+                  </label>
+
+                  <div className="relative">
+                    <MapPin
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+
+                    <input
+                      type="text"
+                      name="location"
+                      value={filter.location}
+                      onChange={handleFilterChange}
+                      placeholder="e.g. Mumbai"
+                      className="
+                        w-full rounded-xl
+                        border border-gray-200
+                        bg-gray-50
+                        py-2.5 pl-9 pr-3
+                        text-sm text-slate-700
+                        outline-none
+                        transition
+                        placeholder:text-slate-400
+                        focus:border-blue-400
+                        focus:bg-white
+                        focus:ring-4
+                        focus:ring-blue-50
+                      "
+                    />
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+                </div>
+
+                {/* Checkboxes */}
+
+                <div>
+                  <label className="mb-3 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Work preferences
+                  </label>
+
+                  <div className="space-y-3">
+
+                    <label className="flex cursor-pointer items-center gap-3 rounded-xl p-2 transition hover:bg-slate-50">
+                      <input
+                        type="checkbox"
+                        name="workFromHome"
+                        checked={filter.workFromHome}
+                        onChange={handleFilterChange}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+
+                      <span className="text-sm font-medium text-slate-700">
+                        Work From Home
+                      </span>
+                    </label>
+
+                    <label className="flex cursor-pointer items-center gap-3 rounded-xl p-2 transition hover:bg-slate-50">
+                      <input
+                        type="checkbox"
+                        name="partTime"
+                        checked={filter.partTime}
+                        onChange={handleFilterChange}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+
+                      <span className="text-sm font-medium text-slate-700">
+                        Part-time
+                      </span>
+                    </label>
+
+                  </div>
+                </div>
+
+                {/* Stipend */}
+
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                      Monthly Stipend
+                    </label>
+
+                    <span className="text-xs font-bold text-blue-600">
+                      ₹{filter.stipend}K
+                    </span>
+                  </div>
+
+                  <input
+                    type="range"
+                    name="stipend"
+                    min="0"
+                    max="100"
+                    value={filter.stipend}
+                    onChange={handleFilterChange}
+                    className="w-full accent-blue-600"
+                  />
+
+                  <div className="mt-1 flex justify-between text-[11px] text-slate-400">
+                    <span>₹0</span>
+                    <span>₹50K</span>
+                    <span>₹100K</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </aside>
+
+          {/* ================= RESULTS ================= */}
+
+          <main className="min-w-0 flex-1">
+
+            {/* Mobile Filter Button */}
+
+            <div className="mb-4 lg:hidden">
+
+              <button
+                onClick={() => setIsFilterVisible(true)}
+                className="
+                  flex w-full items-center justify-center gap-2
+                  rounded-xl
+                  border border-gray-200
+                  bg-white
+                  px-4 py-3
+                  text-sm font-semibold text-slate-700
+                  shadow-sm
+                  transition
+                  hover:border-blue-300
+                  hover:text-blue-600
+                "
+              >
+                <SlidersHorizontal size={18} />
+
+                <span>Filters</span>
+
+                <span className="ml-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-600">
+                  {filteredInternship.length}
+                </span>
+              </button>
+
+            </div>
+
+            {/* Results Header */}
+
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+              <div>
+                <p className="text-sm font-semibold text-slate-900">
+                  {filteredInternship.length} internships found
+                </p>
+
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Browse opportunities that match your interests.
+                </p>
+              </div>
+
+              {(filter.category || filter.location) && (
+                <button
+                  onClick={clearFilters}
+                  className="
+                    self-start
+                    rounded-lg
+                    bg-blue-50
+                    px-3 py-2
+                    text-xs font-semibold text-blue-600
+                    transition hover:bg-blue-100
+                    sm:self-auto
+                  "
+                >
+                  Clear filters
+                </button>
+              )}
+
+            </div>
+
+            {/* ================= INTERNSHIP LIST ================= */}
+
+            <div className="space-y-4">
+
+              {filteredInternship.length > 0 ? (
+                filteredInternship.map((internship: any) => (
+
+                  <article
+                    key={internship._id}
+                    className="
+                      group
+                      rounded-2xl
+                      border border-gray-200
+                      bg-white
+                      p-4
+                      shadow-sm
+                      transition-all duration-200
+                      hover:-translate-y-0.5
+                      hover:border-blue-200
+                      hover:shadow-md
+                      sm:p-5
+                    "
+                  >
+
+                    {/* Top Row */}
+
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+                      <div className="min-w-0">
+
+                        <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
+                          <ArrowUpRight size={13} />
+                          Actively Hiring
+                        </div>
+
+                        <h2 className="text-lg font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-600 sm:text-xl">
+                          {internship.title}
+                        </h2>
+
+                        <p className="mt-1 text-sm font-medium text-slate-500">
+                          {internship.company}
+                        </p>
+
+                      </div>
+
+                      <span className="self-start rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
                         Internship
                       </span>
-                      <div className="flex items-center space-x-1 text-green-600">
-                        <Clock h-4 w-4 />
-                        <span className="text-sm">Posted recently</span>
-                      </div>
+
                     </div>
-                    <Link
-                      href={`/detailInternship/${internship._id}`}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      View detail
-                    </Link>
+
+                    {/* Details */}
+
+                    <div className="mt-5 grid grid-cols-1 gap-3 border-t border-gray-100 pt-4 sm:grid-cols-3">
+
+                      {/* Start Date */}
+
+                      <div className="flex min-w-0 items-center gap-3 rounded-xl bg-slate-50 p-3">
+
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+                          <PlayCircle
+                            size={17}
+                            className="text-blue-600"
+                          />
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            Start Date
+                          </p>
+
+                          <p className="truncate text-sm font-semibold text-slate-700">
+                            {internship.startDate || "Not specified"}
+                          </p>
+                        </div>
+
+                      </div>
+
+                      {/* Location */}
+
+                      <div className="flex min-w-0 items-center gap-3 rounded-xl bg-slate-50 p-3">
+
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+                          <FaLocationDot
+                            className="text-blue-600"
+                            size={15}
+                          />
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            Location
+                          </p>
+
+                          <p className="truncate text-sm font-semibold text-slate-700">
+                            {internship.location || "Not specified"}
+                          </p>
+                        </div>
+
+                      </div>
+
+                      {/* Stipend */}
+
+                      <div className="flex min-w-0 items-center gap-3 rounded-xl bg-slate-50 p-3">
+
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+                          <DollarSign
+                            size={17}
+                            className="text-blue-600"
+                          />
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            Stipend
+                          </p>
+
+                          <p className="truncate text-sm font-semibold text-slate-700">
+                            {internship.stipend || "Not specified"}
+                          </p>
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    {/* Bottom Row */}
+
+                    <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+
+                      <div className="flex flex-wrap items-center gap-2">
+
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                          Internship
+                        </span>
+
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-green-600">
+                          <Clock size={14} />
+                          Posted recently
+                        </div>
+
+                      </div>
+
+                      <Link
+                        href={`/detailInternship/${internship._id}`}
+                        className="
+                          inline-flex
+                          w-full
+                          items-center
+                          justify-center
+                          gap-1
+                          rounded-xl
+                          bg-blue-600
+                          px-4 py-2.5
+                          text-sm font-semibold text-white
+                          transition-all duration-200
+                          hover:bg-blue-700
+                          sm:w-auto
+                        "
+                      >
+                        View details
+                        <ArrowUpRight size={16} />
+                      </Link>
+
+                    </div>
+
+                  </article>
+
+                ))
+              ) : (
+
+                /* ================= EMPTY STATE ================= */
+
+                <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-5 py-14 text-center">
+
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+                    <Search
+                      size={24}
+                      className="text-blue-600"
+                    />
                   </div>
+
+                  <h3 className="mt-4 text-lg font-bold text-slate-900">
+                    No internships found
+                  </h3>
+
+                  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                    Try changing your category or location filters
+                    to find more internship opportunities.
+                  </p>
+
+                  <button
+                    onClick={clearFilters}
+                    className="
+                      mt-5
+                      rounded-xl
+                      bg-blue-600
+                      px-5 py-2.5
+                      text-sm font-semibold text-white
+                      transition
+                      hover:bg-blue-700
+                    "
+                  >
+                    Clear filters
+                  </button>
+
                 </div>
-              ))}
+
+              )}
+
             </div>
-          </div>
+
+          </main>
+
         </div>
+
       </div>
-      {/* Mobile Filters Modal */}
-      {isFiltervisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden">
-          <div className="bg-white h-full w-full max-w-sm ml-auto p-6 overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold">Filters</h2>
+
+      {/* ================= MOBILE FILTER DRAWER ================= */}
+
+      {isFilterVisible && (
+        <div className="fixed inset-0 z-[100] lg:hidden">
+
+          {/* Overlay */}
+
+          <button
+            type="button"
+            aria-label="Close filters"
+            onClick={() => setIsFilterVisible(false)}
+            className="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px]"
+          />
+
+          {/* Drawer */}
+
+          <div
+            className="
+              absolute right-0 top-0
+              h-full
+              w-[88%]
+              max-w-sm
+              overflow-y-auto
+              bg-white
+              shadow-2xl
+              sm:w-[380px]
+            "
+          >
+
+            {/* Drawer Header */}
+
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
+
+              <div className="flex items-center gap-3">
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50">
+                  <Filter
+                    size={18}
+                    className="text-blue-600"
+                  />
+                </div>
+
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">
+                    Filters
+                  </h2>
+
+                  <p className="text-xs text-slate-400">
+                    Refine your search
+                  </p>
+                </div>
+
+              </div>
+
               <button
-                onClick={() => setisFiltervisible(false)}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={() => setIsFilterVisible(false)}
+                className="
+                  flex h-9 w-9
+                  items-center justify-center
+                  rounded-full
+                  bg-slate-100
+                  text-slate-500
+                  transition
+                  hover:bg-slate-200
+                "
               >
-                <X className="h-6 w-6" />
+                <X size={19} />
               </button>
+
             </div>
-            <div className="space-y-6">
-              {/* Profile/Category Filter */}
+
+            {/* Drawer Content */}
+
+            <div className="space-y-6 p-5">
+
+              {/* Category */}
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
                   Category
                 </label>
-                <input
-                  type="text"
-                  name="category"
-                  value={filter.category}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. Marketing Intern"
-                />
+
+                <div className="relative">
+                  <Search
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+
+                  <input
+                    type="text"
+                    name="category"
+                    value={filter.category}
+                    onChange={handleFilterChange}
+                    placeholder="e.g. Marketing"
+                    className="
+                      w-full rounded-xl
+                      border border-gray-200
+                      bg-gray-50
+                      py-3 pl-9 pr-3
+                      text-sm text-slate-700
+                      outline-none
+                      focus:border-blue-400
+                      focus:bg-white
+                      focus:ring-4
+                      focus:ring-blue-50
+                    "
+                  />
+                </div>
               </div>
-              {/* Location Filter */}
+
+              {/* Location */}
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
                   Location
                 </label>
-                <input
-                  type="text"
-                  name="location"
-                  value={filter.location}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. Mumbai"
-                />
+
+                <div className="relative">
+                  <MapPin
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+
+                  <input
+                    type="text"
+                    name="location"
+                    value={filter.location}
+                    onChange={handleFilterChange}
+                    placeholder="e.g. Mumbai"
+                    className="
+                      w-full rounded-xl
+                      border border-gray-200
+                      bg-gray-50
+                      py-3 pl-9 pr-3
+                      text-sm text-slate-700
+                      outline-none
+                      focus:border-blue-400
+                      focus:bg-white
+                      focus:ring-4
+                      focus:ring-blue-50
+                    "
+                  />
+                </div>
               </div>
 
-              {/* Checkboxes */}
-              <div className="space-y-3">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="workFromHome"
-                    checked={filter.workFromHome}
-                    onChange={handlefilterchange}
-                    className="h-4 w-4 text-blue-600 rounded "
-                  />
-                  <span className="text-gray-700">Work from home</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="partTime"
-                    checked={filter.partTime}
-                    onChange={handlefilterchange}
-                    className="h-4 w-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-700">Part-time</span>
-                </label>
-              </div>
+              {/* Work Preferences */}
 
-              {/* Stipend Range */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Monthly Stipend (₹)
+                <label className="mb-3 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Work preferences
                 </label>
+
+                <div className="space-y-2">
+
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-100 p-3 hover:bg-slate-50">
+                    <input
+                      type="checkbox"
+                      name="workFromHome"
+                      checked={filter.workFromHome}
+                      onChange={handleFilterChange}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                    />
+
+                    <span className="text-sm font-medium text-slate-700">
+                      Work From Home
+                    </span>
+                  </label>
+
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-100 p-3 hover:bg-slate-50">
+                    <input
+                      type="checkbox"
+                      name="partTime"
+                      checked={filter.partTime}
+                      onChange={handleFilterChange}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                    />
+
+                    <span className="text-sm font-medium text-slate-700">
+                      Part-time
+                    </span>
+                  </label>
+
+                </div>
+              </div>
+
+              {/* Stipend */}
+
+              <div>
+
+                <div className="mb-2 flex items-center justify-between">
+
+                  <label className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Monthly Stipend
+                  </label>
+
+                  <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600">
+                    ₹{filter.stipend}K
+                  </span>
+
+                </div>
+
                 <input
                   type="range"
                   name="stipend"
                   min="0"
                   max="100"
                   value={filter.stipend}
-                  onChange={handlefilterchange}
-                  className="w-full"
+                  onChange={handleFilterChange}
+                  className="w-full accent-blue-600"
                 />
-                <div className="flex justify-between text-sm text-gray-600">
+
+                <div className="mt-1 flex justify-between text-xs text-slate-400">
                   <span>₹0</span>
                   <span>₹50K</span>
                   <span>₹100K</span>
                 </div>
+
               </div>
+
             </div>
+
+            {/* Drawer Footer */}
+
+            <div className="sticky bottom-0 border-t border-gray-100 bg-white p-4">
+
+              <div className="flex gap-3">
+
+                <button
+                  onClick={clearFilters}
+                  className="
+                    flex-1
+                    rounded-xl
+                    border border-gray-200
+                    px-4 py-3
+                    text-sm font-semibold text-slate-700
+                    hover:bg-slate-50
+                  "
+                >
+                  Clear all
+                </button>
+
+                <button
+                  onClick={() => setIsFilterVisible(false)}
+                  className="
+                    flex-1
+                    rounded-xl
+                    bg-blue-600
+                    px-4 py-3
+                    text-sm font-semibold text-white
+                    hover:bg-blue-700
+                  "
+                >
+                  Show results
+                </button>
+
+              </div>
+
+            </div>
+
           </div>
         </div>
       )}
@@ -363,4 +863,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

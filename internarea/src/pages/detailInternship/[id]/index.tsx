@@ -1,12 +1,22 @@
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
 import {
+  ArrowLeft,
   ArrowUpRight,
+  Briefcase,
+  Building2,
   Calendar,
+  CheckCircle2,
   Clock,
   DollarSign,
   ExternalLink,
+  FileText,
+  Loader2,
   MapPin,
+  Send,
+  ShieldCheck,
+  UserCheck,
+  Users,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -15,16 +25,15 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 
-const index = () => {
+const DetailInternship = () => {
   const router = useRouter();
   const { id } = router.query;
 
   const user = useSelector(selectuser);
 
-  const [internshipData, setinternship] = useState<any>(null);
+  const [internshipData, setInternship] = useState<any>(null);
   const [resume, setResume] = useState<any>(null);
 
-  // Subscription state
   const [subscription, setSubscription] = useState<any>(null);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
 
@@ -32,34 +41,37 @@ const index = () => {
     "Yes, I am available to join immediately"
   );
 
-  const [isModelOpen, setIsModelOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  // --------------------------------------------------
+  // ==================================================
   // FETCH INTERNSHIP
-  // --------------------------------------------------
+  // ==================================================
+
   useEffect(() => {
     if (!id) return;
 
-    const fetchdata = async () => {
+    const fetchInternship = async () => {
       try {
         const res = await axios.get(
           `http://localhost:5000/api/internship/${id}`
         );
 
-        setinternship(res.data);
+        setInternship(res.data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         toast.error("Failed to load internship");
       }
     };
 
-    fetchdata();
+    fetchInternship();
   }, [id]);
 
-  // --------------------------------------------------
+  // ==================================================
   // FETCH RESUME
-  // --------------------------------------------------
+  // ==================================================
+
   useEffect(() => {
     if (!user?.id) return;
 
@@ -71,16 +83,17 @@ const index = () => {
 
         setResume(res.data.resume);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 
     fetchResume();
   }, [user]);
 
-  // --------------------------------------------------
+  // ==================================================
   // FETCH SUBSCRIPTION
-  // --------------------------------------------------
+  // ==================================================
+
   useEffect(() => {
     if (!user?.id) {
       setSubscriptionLoading(false);
@@ -106,21 +119,24 @@ const index = () => {
     fetchSubscription();
   }, [user]);
 
-  // --------------------------------------------------
-  // CHECK APPLICATION LIMIT
-  // --------------------------------------------------
+  // ==================================================
+  // APPLICATION LIMIT
+  // ==================================================
+
   const limitReached =
     !!subscription &&
     subscription.monthlyApplicationLimit !== null &&
-    subscription.applicationsUsed >= subscription.monthlyApplicationLimit;
+    subscription.applicationsUsed >=
+      subscription.monthlyApplicationLimit;
 
-  // --------------------------------------------------
-  // OPEN APPLY MODAL
-  // --------------------------------------------------
+  // ==================================================
+  // APPLY CLICK
+  // ==================================================
+
   const handleApplyClick = () => {
     if (!user) {
       toast.error("Please login first to apply.");
-      setIsModelOpen(true);
+      setIsModalOpen(true);
       return;
     }
 
@@ -129,26 +145,26 @@ const index = () => {
       return;
     }
 
-    setIsModelOpen(true);
+    setIsModalOpen(true);
   };
 
-  // --------------------------------------------------
+  // ==================================================
   // SUBMIT APPLICATION
-  // --------------------------------------------------
-  const handlesubmitapplication = async () => {
-    // Login check
+  // ==================================================
+
+  const handleSubmitApplication = async () => {
     if (!user) {
       toast.error("Please login first.");
       return;
     }
 
-    // Subscription check
     if (!subscription) {
-      toast.error("Unable to verify your subscription. Please try again.");
+      toast.error(
+        "Unable to verify your subscription. Please try again."
+      );
       return;
     }
 
-    // Application limit check
     if (limitReached) {
       toast.error(
         `Monthly application limit reached for your ${subscription.plan} plan.`
@@ -156,30 +172,29 @@ const index = () => {
       return;
     }
 
-    // Resume check
     if (!resume?.resumeUrl) {
       toast.error("Please create/generate your resume first.");
       return;
     }
 
-    // Cover letter check
     if (!coverLetter.trim()) {
       toast.error("Please write a cover letter.");
       return;
     }
 
-    // Availability check
     if (!availability) {
       toast.error("Please select your availability.");
       return;
     }
 
     try {
-      const applicationdata = {
+      setSubmitting(true);
+
+      const applicationData = {
         category: internshipData.category,
         company: internshipData.company,
-        coverLetter: coverLetter,
-        user: user,
+        coverLetter,
+        user,
         Application: id,
         availability,
         resume: resume.resumeUrl,
@@ -187,12 +202,11 @@ const index = () => {
 
       await axios.post(
         "http://localhost:5000/api/application",
-        applicationdata
+        applicationData
       );
 
       toast.success("Application submitted successfully!");
 
-      // Update local application count immediately
       setSubscription((prev: any) => {
         if (!prev) return prev;
 
@@ -202,7 +216,7 @@ const index = () => {
         };
       });
 
-      setIsModelOpen(false);
+      setIsModalOpen(false);
       setCoverLetter("");
 
       router.push("/internship");
@@ -212,13 +226,11 @@ const index = () => {
       const status = error?.response?.status;
       const message = error?.response?.data?.message;
 
-      // Backend subscription limit response
       if (status === 403) {
         toast.error(
           message || "Monthly application limit reached."
         );
 
-        // Refresh subscription information
         try {
           const res = await axios.get(
             `http://localhost:5000/api/payment/subscription/${user.id}`
@@ -235,218 +247,344 @@ const index = () => {
       }
 
       toast.error(message || "Failed to submit application.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // --------------------------------------------------
+  // ==================================================
   // LOADING
-  // --------------------------------------------------
+  // ==================================================
+
   if (!internshipData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5">
+        <div className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+            <Loader2 className="h-7 w-7 animate-spin text-blue-600" />
+          </div>
+
+          <h2 className="mt-5 text-lg font-bold text-slate-800">
+            Loading internship
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Fetching internship details...
+          </p>
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50 px-3 py-6 sm:px-5 sm:py-10 lg:px-8">
+      <div className="mx-auto max-w-6xl">
 
-        {/* Header Section */}
-        <div className="p-6 border-b">
-          <div className="flex items-center space-x-2 text-blue-600 mb-4">
-            <ArrowUpRight className="h-5 w-5" />
-            <span className="font-medium">Actively Hiring</span>
-          </div>
+        {/* ==================================================
+            Back
+        ================================================== */}
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {internshipData.title}
-          </h1>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="mb-5 inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-blue-200 hover:text-blue-600"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
 
-          <p className="text-lg text-gray-600 mb-4">
-            {internshipData.company}
-          </p>
+        {/* ==================================================
+            Main Card
+        ================================================== */}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center space-x-2 text-gray-600">
-              <MapPin className="h-5 w-5" />
-              <span>{internshipData.location}</span>
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+
+          {/* ==================================================
+              Hero
+          ================================================== */}
+
+          <section className="relative overflow-hidden bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-900 px-5 py-7 text-white sm:px-8 sm:py-10 lg:px-10">
+            
+            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
+            <div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl" />
+
+            <div className="relative">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-300">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                Actively Hiring
+              </div>
+
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                <div className="min-w-0">
+                  <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+                    {internshipData.title}
+                  </h1>
+
+                  <p className="mt-3 text-lg font-medium text-blue-200">
+                    {internshipData.company}
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    <div className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-sm text-blue-100 backdrop-blur">
+                      <MapPin className="h-4 w-4" />
+                      {internshipData.location || "Location not specified"}
+                    </div>
+
+                    <div className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-sm text-blue-100 backdrop-blur">
+                      <DollarSign className="h-4 w-4" />
+                      {internshipData.stipend || "Unpaid"}
+                    </div>
+
+                    <div className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-sm text-blue-100 backdrop-blur">
+                      <Calendar className="h-4 w-4" />
+                      {internshipData.startDate || "Flexible"}
+                    </div>
+                  </div>
+
+                  {internshipData.createdAt && (
+                    <div className="mt-5 flex items-center gap-2 text-xs text-blue-200">
+                      <Clock className="h-4 w-4" />
+                      Posted on{" "}
+                      {new Date(
+                        internshipData.createdAt
+                      ).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="hidden shrink-0 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur lg:block">
+                  <ArrowUpRight className="h-9 w-9 text-blue-200" />
+                </div>
+              </div>
             </div>
+          </section>
 
-            <div className="flex items-center space-x-2 text-gray-600">
-              <DollarSign className="h-5 w-5" />
-              <span>{internshipData.stipend}</span>
-            </div>
+          {/* ==================================================
+              Quick Info
+          ================================================== */}
 
-            <div className="flex items-center space-x-2 text-gray-600">
-              <Calendar className="h-5 w-5" />
-              <span>{internshipData.startDate}</span>
-            </div>
-          </div>
+          <section className="grid grid-cols-1 gap-3 border-b border-slate-200 p-5 sm:grid-cols-3 sm:p-8">
+            <InfoCard
+              icon={<MapPin className="h-5 w-5" />}
+              title="Location"
+              value={internshipData.location}
+            />
 
-          <div className="mt-4 flex items-center space-x-2">
-            <Clock className="h-4 w-4 text-green-500" />
+            <InfoCard
+              icon={<DollarSign className="h-5 w-5" />}
+              title="Stipend"
+              value={internshipData.stipend}
+            />
 
-            <span className="text-green-500 text-sm">
-              Posted on {internshipData?.createdAt?.split("T")[0]}
-            </span>
-          </div>
-        </div>
+            <InfoCard
+              icon={<Users className="h-5 w-5" />}
+              title="Openings"
+              value={internshipData.numberOfOpening}
+            />
+          </section>
 
-        {/* Company Section */}
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            About {internshipData.company}
-          </h2>
+          {/* ==================================================
+              About Company
+          ================================================== */}
 
-          <div className="flex items-center space-x-2 mb-4">
+          <ContentSection
+            icon={<Building2Icon />}
+            title={`About ${internshipData.company}`}
+          >
+            {internshipData.aboutCompany || "No company information provided."}
+
             <a
               href="#"
-              className="text-blue-600 hover:text-blue-700 flex items-center space-x-1"
+              onClick={(e) => e.preventDefault()}
+              className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-600 transition hover:text-blue-700"
             >
-              <span>Visit Company Website</span>
+              Visit Company Website
               <ExternalLink className="h-4 w-4" />
             </a>
-          </div>
+          </ContentSection>
 
-          <p className="text-gray-600">
-            {internshipData.aboutCompany}
-          </p>
-        </div>
+          {/* ==================================================
+              Internship Details
+          ================================================== */}
 
-        {/* Internship Details */}
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            About the Internship
-          </h2>
+          <section className="border-b border-slate-200 p-5 sm:p-8 lg:p-10">
+            <SectionTitle
+              icon={<BriefcaseIcon />}
+              title="About the Internship"
+            />
 
-          <p className="text-gray-600 mb-6">
-            {internshipData.aboutInternship}
-          </p>
+            <p className="text-sm leading-7 text-slate-600 sm:text-base">
+              {internshipData.aboutInternship ||
+                "No internship description provided."}
+            </p>
 
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Who can apply
-          </h3>
+            <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2">
+              <InfoBlock
+                title="Who can apply"
+                text={internshipData.whoCanApply}
+              />
 
-          <p className="text-gray-600 mb-6">
-            {internshipData.whoCanApply}
-          </p>
+              <InfoBlock
+                title="Perks"
+                text={internshipData.perks}
+              />
 
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Perks
-          </h3>
+              <InfoBlock
+                title="Additional Information"
+                text={internshipData.additionalInfo}
+              />
 
-          <p className="text-gray-600 mb-6">
-            {internshipData.perks}
-          </p>
+              <InfoBlock
+                title="Number of Openings"
+                text={internshipData.numberOfOpening}
+              />
+            </div>
+          </section>
 
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Additional Information
-          </h3>
+          {/* ==================================================
+              Apply CTA
+          ================================================== */}
 
-          <p className="text-gray-600 mb-6">
-            {internshipData.additionalInfo}
-          </p>
+          <section className="bg-slate-50 p-5 sm:p-8">
+            <div className="flex flex-col gap-5 rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">
+                  Interested in this internship?
+                </h2>
 
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Number of Opening
-          </h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  Submit your resume and application to get started.
+                </p>
+              </div>
 
-          <p className="text-gray-600 mb-6">
-            {internshipData.numberOfOpening}
-          </p>
-        </div>
-
-        {/* Apply Button */}
-        <div className="p-6 flex justify-center">
-          <button
-            onClick={handleApplyClick}
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-150"
-          >
-            Apply Now
-          </button>
+              <button
+                type="button"
+                onClick={handleApplyClick}
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700 sm:w-auto"
+              >
+                <Send className="h-4 w-4" />
+                Apply Now
+              </button>
+            </div>
+          </section>
         </div>
       </div>
 
-      {/* Apply Modal */}
-      {isModelOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      {/* ==================================================
+          Apply Modal
+      ================================================== */}
+
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm sm:p-5"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsModalOpen(false);
+            }
+          }}
+        >
+          <div className="flex max-h-[94vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
 
             {/* Modal Header */}
-            <div className="p-6 border-b">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Apply to {internshipData.company}
-                </h2>
+
+            <div className="shrink-0 bg-gradient-to-r from-blue-700 to-indigo-700 px-5 py-5 text-white sm:px-7">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-blue-200">
+                    Application
+                  </p>
+
+                  <h2 className="mt-1 text-xl font-extrabold sm:text-2xl">
+                    Apply to {internshipData.company}
+                  </h2>
+
+                  <p className="mt-1 text-sm text-blue-100">
+                    {internshipData.title}
+                  </p>
+                </div>
 
                 <button
-                  onClick={() => setIsModelOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-white/20"
+                  aria-label="Close application modal"
                 >
-                  <X className="h-6 w-6" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
 
-            <div className="p-6 px-8 space-y-6">
+            {/* Modal Content */}
 
-              {/* Not Logged In */}
+            <div className="overflow-y-auto p-5 sm:p-7">
+
+              {/* Not logged in */}
+
               {!user ? (
-                <div className="border rounded-lg p-6 bg-blue-50 text-center">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6 text-center">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
+                    <ShieldCheck className="h-7 w-7 text-blue-600" />
+                  </div>
+
+                  <h3 className="mt-4 text-xl font-bold text-slate-900">
                     Login Required
                   </h3>
 
-                  <p className="text-gray-600 mb-4">
-                    Please login or create an account before applying.
+                  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                    Please login or create an account before applying
+                    for this internship.
                   </p>
 
                   <Link
-                    href="/"
-                    className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                    href="/login"
+                    className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
                   >
-                    Sign up / Login
+                    Login / Create Account
                   </Link>
                 </div>
               ) : (
-                <>
-                  {/* Subscription Usage */}
-                  <div className="border rounded-lg p-4 bg-blue-50">
-                    <div className="flex justify-between items-center">
+                <div className="space-y-6">
+
+                  {/* Subscription */}
+
+                  <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                           Current Plan
                         </p>
 
-                        <p className="text-lg font-bold text-gray-900 capitalize">
+                        <p className="mt-1 text-xl font-extrabold capitalize text-slate-900">
                           {subscriptionLoading
                             ? "Checking..."
                             : subscription?.plan || "Free"}
                         </p>
                       </div>
 
-                      <div className="text-right">
-                        <p className="text-sm text-gray-500">
-                          Applications
+                      <div className="sm:text-right">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Monthly Applications
                         </p>
 
                         {subscriptionLoading ? (
-                          <p className="font-semibold text-gray-900">
+                          <p className="mt-1 font-bold text-slate-800">
                             Checking...
                           </p>
                         ) : subscription?.monthlyApplicationLimit ===
                           null ? (
-                          <p className="font-semibold text-green-600">
+                          <p className="mt-1 font-bold text-emerald-600">
                             Unlimited
                           </p>
                         ) : (
                           <p
-                            className={`font-semibold ${
+                            className={`mt-1 font-bold ${
                               limitReached
                                 ? "text-red-600"
-                                : "text-gray-900"
+                                : "text-slate-800"
                             }`}
                           >
                             {subscription?.applicationsUsed || 0} /{" "}
@@ -456,17 +594,16 @@ const index = () => {
                       </div>
                     </div>
 
-                    {/* Upgrade Message */}
                     {limitReached && (
-                      <div className="mt-4 border-t pt-4">
-                        <p className="text-red-600 font-medium mb-3">
+                      <div className="mt-4 border-t border-blue-100 pt-4">
+                        <p className="text-sm font-semibold text-red-600">
                           You have reached your monthly application
                           limit.
                         </p>
 
                         <Link
                           href="/subscription"
-                          className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+                          className="mt-3 inline-flex min-h-10 items-center justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
                         >
                           Upgrade Plan
                         </Link>
@@ -474,49 +611,59 @@ const index = () => {
                     )}
                   </div>
 
-                  {/* Resume Section */}
+                  {/* Resume */}
+
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Your Resume
-                    </h3>
+                    <SectionTitle
+                      icon={<FileText className="h-5 w-5" />}
+                      title="Your Resume"
+                      small
+                    />
 
                     {resume?.resumeUrl ? (
-                      <div className="border rounded-lg p-4 flex justify-between items-center bg-gray-50">
-                        <div>
-                          <p className="font-semibold text-gray-800">
-                            {resume.fullname}'s Resume
-                          </p>
+                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p className="font-bold text-slate-800">
+                              {resume.fullname || "Your Resume"}
+                            </p>
 
-                          <p className="text-sm text-green-600">
-                            Generated resume attached
-                          </p>
+                            <p className="mt-1 flex items-center gap-2 text-sm text-emerald-700">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Generated resume attached
+                            </p>
+                          </div>
+
+                          <a
+                            href={`http://localhost:5000/uploads/resume/${resume.resumeUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex min-h-10 items-center justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-blue-600 shadow-sm transition hover:bg-blue-50"
+                          >
+                            View Resume
+                          </a>
                         </div>
-
-                        <a
-                          href={`http://localhost:5000/uploads/resume/${resume.resumeUrl}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                        >
-                          View Resume
-                        </a>
                       </div>
                     ) : (
-                      <div className="border rounded-lg p-4 bg-red-50">
-                        <p className="text-red-600">
-                          No generated resume found.
+                      <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                        <p className="text-sm font-semibold text-red-600">
+                          No generated resume found. Please create your
+                          resume before applying.
                         </p>
                       </div>
                     )}
                   </div>
 
                   {/* Cover Letter */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Cover Letter
-                    </h3>
 
-                    <p className="text-gray-600 mb-2">
+                  <div>
+                    <SectionTitle
+                      icon={<FileText className="h-5 w-5" />}
+                      title="Cover Letter"
+                      small
+                    />
+
+                    <p className="mb-3 text-sm text-slate-500">
                       Why should you be selected for this internship?
                     </p>
 
@@ -525,18 +672,26 @@ const index = () => {
                       onChange={(e) =>
                         setCoverLetter(e.target.value)
                       }
-                      placeholder="Write your cover letter here"
-                      className="w-full h-32 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
+                      placeholder="Write your cover letter here..."
+                      rows={7}
+                      className="w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                     />
+
+                    <p className="mt-2 text-right text-xs text-slate-400">
+                      {coverLetter.length} characters
+                    </p>
                   </div>
 
                   {/* Availability */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Your Availability
-                    </h3>
 
-                    <div className="space-y-3">
+                  <div>
+                    <SectionTitle
+                      icon={<UserCheck className="h-5 w-5" />}
+                      title="Your Availability"
+                      small
+                    />
+
+                    <div className="space-y-2">
                       {[
                         "Yes, I am available to join immediately",
                         "No, I am currently on notice period",
@@ -545,7 +700,11 @@ const index = () => {
                       ].map((option) => (
                         <label
                           key={option}
-                          className="flex items-center space-x-2"
+                          className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition ${
+                            availability === option
+                              ? "border-blue-300 bg-blue-50"
+                              : "border-slate-200 bg-white hover:bg-slate-50"
+                          }`}
                         >
                           <input
                             type="radio"
@@ -555,10 +714,10 @@ const index = () => {
                             onChange={(e) =>
                               setAvailability(e.target.value)
                             }
-                            className="h-4 w-4 text-blue-600"
+                            className="mt-0.5 h-4 w-4 accent-blue-600"
                           />
 
-                          <span className="text-gray-700">
+                          <span className="text-sm leading-5 text-slate-700">
                             {option}
                           </span>
                         </label>
@@ -567,38 +726,146 @@ const index = () => {
                   </div>
 
                   {/* Submit */}
-                  <div className="flex justify-end pt-4">
+
+                  <div className="border-t border-slate-200 pt-5">
                     {limitReached ? (
                       <Link
                         href="/subscription"
-                        className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                        className="flex min-h-12 w-full items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
                       >
-                        Upgrade Plan
+                        Upgrade Plan to Apply
                       </Link>
                     ) : (
                       <button
-                        className={`px-6 py-2 rounded-lg ${
-                          subscriptionLoading
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700"
-                        } text-white`}
-                        onClick={handlesubmitapplication}
-                        disabled={subscriptionLoading}
+                        type="button"
+                        onClick={handleSubmitApplication}
+                        disabled={
+                          subscriptionLoading || submitting
+                        }
+                        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {subscriptionLoading
-                          ? "Checking Plan..."
-                          : "Submit Application"}
+                        {submitting && (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        )}
+
+                        {submitting
+                          ? "Submitting Application..."
+                          : subscriptionLoading
+                            ? "Checking Plan..."
+                            : "Submit Application"}
                       </button>
                     )}
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 
-export default index;
+// ==================================================
+// Reusable Components
+// ==================================================
+
+const InfoCard = ({
+  icon,
+  title,
+  value,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  value?: any;
+}) => (
+  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+    <div className="flex items-center gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+        {icon}
+      </div>
+
+      <div className="min-w-0">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          {title}
+        </p>
+
+        <p className="mt-1 truncate text-sm font-bold text-slate-800">
+          {value || "Not specified"}
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+const ContentSection = ({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <section className="border-b border-slate-200 p-5 sm:p-8 lg:p-10">
+    <SectionTitle icon={icon} title={title} />
+
+    <p className="text-sm leading-7 text-slate-600 sm:text-base">
+      {children}
+    </p>
+  </section>
+);
+
+const InfoBlock = ({
+  title,
+  text,
+}: {
+  title: string;
+  text?: any;
+}) => (
+  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+    <h3 className="font-bold text-slate-900">{title}</h3>
+
+    <p className="mt-2 text-sm leading-6 text-slate-600">
+      {text || "Not specified."}
+    </p>
+  </div>
+);
+
+const SectionTitle = ({
+  icon,
+  title,
+  small = false,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  small?: boolean;
+}) => (
+  <div className={`flex items-center gap-3 ${small ? "mb-3" : "mb-5"}`}>
+    <div
+      className={`flex shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ${
+        small ? "h-9 w-9" : "h-10 w-10"
+      }`}
+    >
+      {icon}
+    </div>
+
+    <h2
+      className={`font-bold text-slate-900 ${
+        small ? "text-lg" : "text-xl sm:text-2xl"
+      }`}
+    >
+      {title}
+    </h2>
+  </div>
+);
+
+const Building2Icon = () => (
+  <Building2 className="h-5 w-5" />
+);
+
+const BriefcaseIcon = () => (
+  <Briefcase className="h-5 w-5" />
+);
+
+export default DetailInternship;

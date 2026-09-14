@@ -1,148 +1,399 @@
 import axios from "axios";
-import { Building2, Calendar, FileText, Loader2, User } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  Calendar,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  Mail,
+  User,
+  XCircle,
+} from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
-const index = () => {
+const getStatusStyles = (status: string = "") => {
+  switch (status.toLowerCase()) {
+    case "accepted":
+      return {
+        wrapper: "border-emerald-200 bg-emerald-50",
+        text: "text-emerald-700",
+        icon: CheckCircle2,
+      };
+
+    case "rejected":
+      return {
+        wrapper: "border-red-200 bg-red-50",
+        text: "text-red-700",
+        icon: XCircle,
+      };
+
+    default:
+      return {
+        wrapper: "border-amber-200 bg-amber-50",
+        text: "text-amber-700",
+        icon: Loader2,
+      };
+  }
+};
+
+const formatDate = (date?: string) => {
+  if (!date) return "N/A";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "N/A";
+  }
+
+  return parsedDate.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+const DetailApplication = () => {
   const router = useRouter();
   const { id } = router.query;
-  const [loading, setloading] = useState(false);
-  const [data, setdata] = useState<any>({});
+
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>(null);
+
+  // --------------------------------------------------
+  // Fetch application
+  // --------------------------------------------------
+
   useEffect(() => {
-    const fetchdata = async () => {
+    if (!id) return;
+
+    const fetchData = async () => {
       try {
-        setloading(true);
+        setLoading(true);
+
         const res = await axios.get(
-          `http://localhost:5000/api/application/${id}`,
+          `http://localhost:5000/api/application/${id}`
         );
-        setdata(res.data);
+
+        setData(res.data);
       } catch (error) {
-        console.log(error);
+        console.error("Error loading application:", error);
       } finally {
-        setloading(false);
+        setLoading(false);
       }
     };
-    fetchdata();
+
+    fetchData();
   }, [id]);
+
+  // --------------------------------------------------
+  // Loading
+  // --------------------------------------------------
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-        <span className="ml-2 text-gray-600">
-          Loading application details...
-        </span>
-      </div>
+      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5">
+        <div className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+            <Loader2 className="h-7 w-7 animate-spin text-blue-600" />
+          </div>
+
+          <h2 className="mt-5 text-lg font-bold text-slate-800">
+            Loading application
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Fetching application details...
+          </p>
+        </div>
+      </main>
     );
   }
-  return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border">
-        {/* Header */}
-        <div className="border-b p-8 flex flex-col md:flex-row items-center gap-6">
-          <img
-            src={data?.user?.photo}
-            alt="Applicant"
-            className="w-24 h-24 rounded-full object-cover border"
-          />
 
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              {data?.user?.name}
-            </h1>
+  // --------------------------------------------------
+  // No data
+  // --------------------------------------------------
 
-            <p className="text-gray-500 mt-1">Internship Application</p>
+  if (!data) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5">
+        <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
+            <FileText className="h-7 w-7 text-red-500" />
           </div>
 
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              data.status === "accepted"
-                ? "bg-green-100 text-green-700"
-                : data.status === "rejected"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-yellow-100 text-yellow-700"
-            }`}
+          <h2 className="mt-5 text-xl font-bold text-slate-900">
+            Application not found
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            We couldn't load the requested application.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
           >
-            {data.status}
-          </span>
+            <ArrowLeft className="h-4 w-4" />
+            Go Back
+          </button>
         </div>
+      </main>
+    );
+  }
 
-        {/* Information */}
-        <div className="grid md:grid-cols-2 gap-8 p-8">
-          <div>
-            <div className="flex items-center gap-2 text-gray-500 mb-2">
-              <Building2 size={18} />
-              <span>Company</span>
-            </div>
+  const status = data.status || "pending";
+  const statusStyles = getStatusStyles(status);
+  const StatusIcon = statusStyles.icon;
 
-            <p className="text-lg font-medium text-gray-900">{data.company}</p>
-          </div>
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50 px-3 py-6 sm:px-5 sm:py-10 lg:px-8">
+      <div className="mx-auto max-w-5xl">
 
-          <div>
-            <div className="flex items-center gap-2 text-gray-500 mb-2">
-              <Calendar size={18} />
-              <span>Applied On</span>
-            </div>
+        {/* ==================================================
+            Back Button
+        ================================================== */}
 
-            <p className="text-lg font-medium text-gray-900">
-              {data.createdAt && new Date(data.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="mb-5 inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-blue-200 hover:text-blue-600"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
 
-        {/* Cover Letter */}
-        <div className="border-t border-gray-200 p-8">
-          <div className="flex items-center gap-2 mb-6">
-            <FileText size={20} className="text-gray-700" />
-            <h2 className="text-xl font-semibold text-gray-900">
-              Cover Letter
-            </h2>
-          </div>
+        {/* ==================================================
+            Header
+        ================================================== */}
 
-          <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-            <p className="text-gray-800 text-[16px] leading-8 whitespace-pre-wrap font-normal">
-              {data.coverLetter}
-            </p>
-          </div>
-        </div>
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
 
-        {/* Resume */}
-        <div className="border-t border-gray-200 p-8">
-          <div className="flex items-center gap-2 mb-6">
-            <FileText size={20} className="text-gray-700" />
-            <h2 className="text-xl font-semibold text-gray-900">
-              Attached Resume
-            </h2>
-          </div>
+          <div className="relative bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-900 px-5 py-7 text-white sm:px-8 sm:py-9">
+            
+            <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-blue-500/20 blur-3xl" />
 
-          {data?.resume ? (
-            <div className="bg-white border rounded-xl p-6 flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {data.resume.fullname}
-                </h3>
+            <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center">
 
-                <p className="text-gray-500">{data.resume.email}</p>
+              {/* Applicant photo */}
 
-                <p className="text-green-600">✔ Resume attached successfully</p>
+              <div className="mx-auto shrink-0 sm:mx-0">
+                {data?.user?.photo ? (
+                  <img
+                    src={data.user.photo}
+                    alt={data?.user?.name || "Applicant"}
+                    className="h-24 w-24 rounded-2xl border-4 border-white/20 object-cover shadow-xl sm:h-28 sm:w-28"
+                  />
+                ) : (
+                  <div className="flex h-24 w-24 items-center justify-center rounded-2xl border-4 border-white/10 bg-white/10 sm:h-28 sm:w-28">
+                    <User className="h-10 w-10 text-blue-200" />
+                  </div>
+                )}
               </div>
 
-              <a
-                href={`http://localhost:5000/uploads/resume/${data.resume.resumeUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
-              >
-                View Resume
-              </a>
-            </div>
-          ) : (
-            <p className="text-red-500">No Resume Attached</p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};1
+              {/* Applicant information */}
 
-export default index;
+              <div className="min-w-0 flex-1 text-center sm:text-left">
+                <p className="text-xs font-semibold uppercase tracking-wider text-blue-300">
+                  Internship Application
+                </p>
+
+                <h1 className="mt-1 truncate text-2xl font-extrabold sm:text-3xl">
+                  {data?.user?.name || "Unknown Applicant"}
+                </h1>
+
+                <div className="mt-3 flex flex-col gap-2 text-sm text-blue-100 sm:flex-row sm:flex-wrap">
+                  {data?.user?.email && (
+                    <span className="inline-flex items-center justify-center gap-2 sm:justify-start">
+                      <Mail className="h-4 w-4" />
+                      {data.user.email}
+                    </span>
+                  )}
+
+                  {data?.company && (
+                    <span className="inline-flex items-center justify-center gap-2 sm:justify-start">
+                      <Building2 className="h-4 w-4" />
+                      {data.company}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Status */}
+
+              <div className="flex justify-center sm:justify-end">
+                <span
+                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold capitalize ${statusStyles.wrapper} ${statusStyles.text}`}
+                >
+                  <StatusIcon
+                    className={`h-4 w-4 ${
+                      status === "pending" ? "animate-pulse" : ""
+                    }`}
+                  />
+
+                  {status}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ==================================================
+              Application Information
+          ================================================== */}
+
+          <div className="grid grid-cols-1 gap-4 border-b border-slate-200 p-5 sm:grid-cols-2 sm:p-8">
+
+            {/* Company */}
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                </div>
+
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Company
+                  </p>
+
+                  <p className="mt-1 font-bold text-slate-900">
+                    {data.company || "N/A"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Applied Date */}
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50">
+                  <Calendar className="h-5 w-5 text-indigo-600" />
+                </div>
+
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Applied On
+                  </p>
+
+                  <p className="mt-1 font-bold text-slate-900">
+                    {formatDate(data.createdAt)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ==================================================
+              Cover Letter
+          ================================================== */}
+
+          <section className="border-b border-slate-200 p-5 sm:p-8">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50">
+                <FileText className="h-5 w-5 text-violet-600" />
+              </div>
+
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">
+                  Cover Letter
+                </h2>
+
+                <p className="text-xs text-slate-500">
+                  Applicant's submitted cover letter
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-7">
+              {data.coverLetter ? (
+                <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700 sm:text-base">
+                  {data.coverLetter}
+                </p>
+              ) : (
+                <p className="text-sm italic text-slate-400">
+                  No cover letter was provided.
+                </p>
+              )}
+            </div>
+          </section>
+
+          {/* ==================================================
+              Resume
+          ================================================== */}
+
+          <section className="p-5 sm:p-8">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+                <FileText className="h-5 w-5 text-blue-600" />
+              </div>
+
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">
+                  Attached Resume
+                </h2>
+
+                <p className="text-xs text-slate-500">
+                  Resume submitted with this application
+                </p>
+              </div>
+            </div>
+
+            {data?.resume ? (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+                  <div className="min-w-0">
+                    <h3 className="truncate text-lg font-bold text-slate-900">
+                      {data.resume.fullname || "Applicant Resume"}
+                    </h3>
+
+                    {data.resume.email && (
+                      <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                        <Mail className="h-4 w-4" />
+                        {data.resume.email}
+                      </p>
+                    )}
+
+                    <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Resume attached successfully
+                    </div>
+                  </div>
+
+                  <a
+                    href={`http://localhost:5000/uploads/resume/${data.resume.resumeUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 sm:w-auto"
+                  >
+                    <FileText className="h-4 w-4" />
+                    View Resume
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+                <div className="flex items-center gap-3">
+                  <XCircle className="h-5 w-5 text-red-500" />
+
+                  <p className="text-sm font-semibold text-red-700">
+                    No resume attached to this application.
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
+        </section>
+
+        {/* Bottom spacing */}
+
+        <div className="h-6" />
+      </div>
+    </main>
+  );
+};
+
+export default DetailApplication;

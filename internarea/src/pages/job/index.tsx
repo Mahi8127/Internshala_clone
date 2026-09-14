@@ -1,121 +1,27 @@
 import axios from "axios";
 import {
   ArrowUpRight,
-  Calendar,
-  Clock,
   DollarSign,
   Filter,
+  Clock,
   PlayCircle,
   X,
+  Search,
+  MapPin,
+  SlidersHorizontal,
+  BriefcaseBusiness,
 } from "lucide-react";
 import Link from "next/link";
+
 import React, { useEffect, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 
-const index = () => {
-  // const filteredJobs = [
-  //   {
-  //     _id: "101",
-  //     title: "Frontend Developer",
-  //     company: "Amazon",
-  //     location: "Seattle",
-  //     CTC: "$100K/year",
-  //     Experience: "2+ years",
-  //     category: "Engineering",
-  //     StartDate: "April 1, 2025",
-  //     aboutCompany:
-  //       "Amazon is a global leader in e-commerce and cloud computing, providing cutting-edge technology solutions.",
-  //     aboutJob:
-  //       "Seeking a skilled Frontend Developer proficient in React.js, JavaScript, and UI development.",
-  //     Whocanapply:
-  //       "Developers with experience in JavaScript, React.js, and modern frontend frameworks.",
-  //     perks:
-  //       "Remote work, stock options, health insurance, learning resources.",
-  //     AdditionalInfo: "This role is hybrid with occasional onsite meetings.",
-  //     numberOfopning: "3",
-  //   },
-  //   {
-  //     _id: "102",
-  //     title: "Data Analyst",
-  //     company: "Microsoft",
-  //     location: "Remote",
-  //     CTC: "$90K/year",
-  //     Experience: "1+ years",
-  //     category: "Data Science",
-  //     StartDate: "March 15, 2025",
-  //     aboutCompany:
-  //       "Microsoft is a technology company specializing in software development, cloud computing, and AI.",
-  //     aboutJob:
-  //       "Looking for a Data Analyst with expertise in SQL, Python, and data visualization tools.",
-  //     Whocanapply:
-  //       "Candidates with experience in data analytics, SQL, Python, and Tableau/Power BI.",
-  //     perks: "Flexible hours, remote work, upskilling programs, bonuses.",
-  //     AdditionalInfo: "This is a fully remote role.",
-  //     numberOfopning: "2",
-  //   },
-  //   {
-  //     _id: "103",
-  //     title: "UX Designer",
-  //     company: "Apple",
-  //     location: "California",
-  //     CTC: "$110K/year",
-  //     Experience: "3+ years",
-  //     category: "Design",
-  //     StartDate: "March 30, 2025",
-  //     aboutCompany:
-  //       "Apple is a leader in consumer electronics and software, focusing on design and innovation.",
-  //     aboutJob:
-  //       "Seeking a UX Designer to craft intuitive user experiences for our next-generation products.",
-  //     Whocanapply:
-  //       "Designers with experience in Figma, Adobe XD, user research, and usability testing.",
-  //     perks:
-  //       "Creative environment, free lunches, fitness perks, flexible hours.",
-  //     AdditionalInfo: "Office-based with occasional remote work options.",
-  //     numberOfopning: "1",
-  //   },
-  //   {
-  //     _id: "104",
-  //     title: "Backend Developer",
-  //     company: "NextGen Solutions",
-  //     location: "Austin, TX",
-  //     CTC: "$90,000 - $110,000",
-  //     Experience: "3-5 years",
-  //     category: "Engineering",
-  //     StartDate: "March 20, 2025",
-  //     aboutCompany:
-  //       "NextGen Solutions specializes in building scalable backend systems and APIs for high-performance applications.",
-  //     aboutJob:
-  //       "Looking for a Backend Developer skilled in Node.js, Express.js, and database management.",
-  //     Whocanapply:
-  //       "Developers with experience in server-side programming, databases (SQL, NoSQL), and RESTful APIs.",
-  //     perks: "Stock options, remote work, gym membership, yearly bonuses.",
-  //     AdditionalInfo: "Hybrid role with 2 days of in-office meetings per week.",
-  //     numberOfopning: "3",
-  //   },
-  //   {
-  //     _id: "105",
-  //     title: "UI/UX Designer",
-  //     company: "Design Pro",
-  //     location: "San Francisco, CA",
-  //     CTC: "$70,000 - $85,000",
-  //     Experience: "2+ years",
-  //     category: "Design",
-  //     StartDate: "March 25, 2025",
-  //     aboutCompany:
-  //       "Design Pro is an award-winning UI/UX design agency focusing on innovative user experiences.",
-  //     aboutJob:
-  //       "We need a UI/UX Designer who can create user-friendly interfaces and improve the user experience of our applications.",
-  //     Whocanapply:
-  //       "Designers with proficiency in Figma, Adobe XD, and user research methodologies.",
-  //     perks:
-  //       "Creative workspace, wellness programs, free team lunches, flexible hours.",
-  //     AdditionalInfo: "Office-based with flexible working hours.",
-  //     numberOfopning: "1",
-  //   },
-  // ];
-  const [filteredjobs, setfilteredjobs] = useState<any>([]);
-  const [isFiltervisible, setisFiltervisible] = useState(false);
-  const [filter, setfilters] = useState({
+const Index = () => {
+  const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
+  const [jobData, setJobData] = useState<any[]>([]);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+
+  const [filter, setFilters] = useState({
     category: "",
     location: "",
     workFromHome: false,
@@ -123,40 +29,62 @@ const index = () => {
     salary: 50,
     experience: "",
   });
-  const [filteredJobs, setjob] = useState<any>([]);
+
+  /* ================= FETCH JOBS ================= */
+
   useEffect(() => {
-    const fetchdata = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/job");
-        setjob(res.data);
-        setfilteredjobs(res.data);
+        const res = await axios.get(
+          "http://localhost:5000/api/job"
+        );
+
+        setJobData(res.data);
+        setFilteredJobs(res.data);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchdata();
+
+    fetchData();
   }, []);
+
+  /* ================= FILTER ================= */
+
   useEffect(() => {
-    const filtered = filteredJobs.filter((job:any) => {
-      const matchesCategory = job.category
+    const filtered = jobData.filter((job: any) => {
+      const category = job.category || "";
+      const location = job.location || "";
+
+      const matchesCategory = category
         .toLowerCase()
         .includes(filter.category.toLowerCase());
-      const matchesLocation = job.location
+
+      const matchesLocation = location
         .toLowerCase()
         .includes(filter.location.toLowerCase());
+
       return matchesCategory && matchesLocation;
     });
-    setfilteredjobs(filtered);
-  }, [filter, filteredJobs]);
-  const handlefilterchange = (e: any) => {
+
+    setFilteredJobs(filtered);
+  }, [filter, jobData]);
+
+  /* ================= FILTER CHANGE ================= */
+
+  const handleFilterChange = (e: any) => {
     const { name, value, type, checked } = e.target;
-    setfilters((prev) => ({
+
+    setFilters((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
+  /* ================= CLEAR FILTERS ================= */
+
   const clearFilters = () => {
-    setfilters({
+    setFilters({
       category: "",
       location: "",
       workFromHome: false,
@@ -165,295 +93,912 @@ const index = () => {
       experience: "",
     });
   };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Filter */}
-          <div className="hidden md:block w-64 bg-white rounded-lg shadow-sm p-6 h-fit">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-2">
-                <Filter className="h-5 w-5 text-blue-600" />
-                <span className="font-medium text-black">Filters</span>
-              </div>
-              <button
-                onClick={clearFilters}
-                className="text-sm text-blue-600 hover:text-blue-800"
-              >
-                Clear all
-              </button>
+    <div className="min-h-screen bg-slate-50">
+
+      {/* ================= PAGE HEADER ================= */}
+
+      <section className="border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
+
+          <div className="max-w-3xl">
+
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
+              <BriefcaseBusiness size={14} />
+              Find your next career opportunity
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  name="category"
-                  value={filter.category}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. Marketing Intern"
-                />
-              </div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Find your next job
+            </h1>
 
-              {/* location filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  name="location"
-                  value={filter.location}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. Mumbai"
-                />
-              </div>
+            <p className="mt-2 text-sm leading-6 text-slate-500 sm:text-base">
+              Explore job opportunities from different companies
+              and find a role that matches your skills and experience.
+            </p>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Experience
-                </label>
-                <input
-                  type="text"
-                  name="experience"
-                  value={filter.experience}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. 1 year"
-                />
-              </div>
-
-              {/* checkbox */}
-              <div className="space-y-3">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="workFromHome"
-                    checked={filter.workFromHome}
-                    onChange={handlefilterchange}
-                    className="h-4 w-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-700">Work From Home</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="partTime"
-                    checked={filter.partTime}
-                    onChange={handlefilterchange}
-                    className="h-4 w-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-700">Part-time</span>
-                </label>
-              </div>
-
-              {/* stipen range */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Annual Salary (₹ in lakhs)
-                </label>
-                <input
-                  type="range"
-                  name="salary"
-                  min="0"
-                  max="100"
-                  value={filter.salary}
-                  onChange={handlefilterchange}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>₹0L</span>
-                  <span>₹50L</span>
-                  <span>₹100L</span>
-                </div>
-              </div>
-            </div>
           </div>
-          <div className="flex-1">
-            <div className="md:hidden mb-4">
-              <button
-                onClick={() => setisFiltervisible(!isFiltervisible)}
-                className="w-full flex items-center justify-center space-x-2 bg-white p-3 rounded-lg shadow-sm text-black"
-              >
-                <Filter className="h-5 w-5" />
-                <span>Show Filters</span>
-              </button>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-              <p className="text-center font-medium text-black">
-                {filteredjobs.length} Jobs found
-              </p>
-            </div>
-            <div className="space-y-4">
-              {filteredjobs.map((job: any) => (
-                <div
-                  key={job._id}
-                  className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+
+        </div>
+      </section>
+
+      {/* ================= MAIN CONTENT ================= */}
+
+      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+
+        <div className="flex flex-col gap-6 lg:flex-row">
+
+          {/* ================= DESKTOP FILTER ================= */}
+
+          <aside className="hidden w-64 shrink-0 lg:block">
+
+            <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+
+              {/* Filter Header */}
+
+              <div className="mb-6 flex items-center justify-between">
+
+                <div className="flex items-center gap-2">
+
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50">
+                    <Filter
+                      size={18}
+                      className="text-blue-600"
+                    />
+                  </div>
+
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-900">
+                      Filters
+                    </h2>
+
+                    <p className="text-xs text-slate-400">
+                      Refine results
+                    </p>
+                  </div>
+
+                </div>
+
+                <button
+                  onClick={clearFilters}
+                  className="text-xs font-semibold text-blue-600 transition hover:text-blue-800"
                 >
-                  <div className="flex items-center space-x-2 text-blue-600 mmb-4">
-                    <ArrowUpRight className="h-5 w-5" />
-                    <span className="font-medium">Actively Hiring</span>
+                  Clear
+                </button>
+
+              </div>
+
+              <div className="space-y-6">
+
+                {/* Category */}
+
+                <div>
+
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Category
+                  </label>
+
+                  <div className="relative">
+
+                    <Search
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+
+                    <input
+                      type="text"
+                      name="category"
+                      value={filter.category}
+                      onChange={handleFilterChange}
+                      placeholder="e.g. Engineering"
+                      className="
+                        w-full rounded-xl
+                        border border-gray-200
+                        bg-gray-50
+                        py-2.5 pl-9 pr-3
+                        text-sm text-slate-700
+                        outline-none
+                        transition
+                        placeholder:text-slate-400
+                        focus:border-blue-400
+                        focus:bg-white
+                        focus:ring-4
+                        focus:ring-blue-50
+                      "
+                    />
+
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    {job.title}
-                  </h2>
-                  <p className="text-gray-600 mb-4">{job.company}</p>
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <PlayCircle className="h-5 w-5" />
-                      <div>
-                        <p className="text-sm font-medium">Start Date</p>
-                        <p className="text-sm">{job.startDate}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <FaLocationDot className="h-5 w-5" />
-                      <div>
-                        <p className="text-sm font-medium">Location: </p>
-                        <p className="text-sm">{job.location}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <DollarSign className="h-5 w-5" />
-                      <p className="text-sm font-medium">CTC: </p>
-                      <p className="text-sm">{job.CTC}</p>
-                    </div>
+
+                </div>
+
+                {/* Location */}
+
+                <div>
+
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Location
+                  </label>
+
+                  <div className="relative">
+
+                    <MapPin
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+
+                    <input
+                      type="text"
+                      name="location"
+                      value={filter.location}
+                      onChange={handleFilterChange}
+                      placeholder="e.g. Mumbai"
+                      className="
+                        w-full rounded-xl
+                        border border-gray-200
+                        bg-gray-50
+                        py-2.5 pl-9 pr-3
+                        text-sm text-slate-700
+                        outline-none
+                        transition
+                        placeholder:text-slate-400
+                        focus:border-blue-400
+                        focus:bg-white
+                        focus:ring-4
+                        focus:ring-blue-50
+                      "
+                    />
+
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+
+                </div>
+
+                {/* Experience */}
+
+                <div>
+
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Experience
+                  </label>
+
+                  <input
+                    type="text"
+                    name="experience"
+                    value={filter.experience}
+                    onChange={handleFilterChange}
+                    placeholder="e.g. 1 year"
+                    className="
+                      w-full rounded-xl
+                      border border-gray-200
+                      bg-gray-50
+                      px-3 py-2.5
+                      text-sm text-slate-700
+                      outline-none
+                      transition
+                      placeholder:text-slate-400
+                      focus:border-blue-400
+                      focus:bg-white
+                      focus:ring-4
+                      focus:ring-blue-50
+                    "
+                  />
+
+                </div>
+
+                {/* Work Preferences */}
+
+                <div>
+
+                  <label className="mb-3 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Work preferences
+                  </label>
+
+                  <div className="space-y-2">
+
+                    <label className="flex cursor-pointer items-center gap-3 rounded-xl p-2 transition hover:bg-slate-50">
+
+                      <input
+                        type="checkbox"
+                        name="workFromHome"
+                        checked={filter.workFromHome}
+                        onChange={handleFilterChange}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+
+                      <span className="text-sm font-medium text-slate-700">
+                        Work From Home
+                      </span>
+
+                    </label>
+
+                    <label className="flex cursor-pointer items-center gap-3 rounded-xl p-2 transition hover:bg-slate-50">
+
+                      <input
+                        type="checkbox"
+                        name="partTime"
+                        checked={filter.partTime}
+                        onChange={handleFilterChange}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+
+                      <span className="text-sm font-medium text-slate-700">
+                        Part-time
+                      </span>
+
+                    </label>
+
+                  </div>
+
+                </div>
+
+                {/* Salary */}
+
+                <div>
+
+                  <div className="mb-2 flex items-center justify-between">
+
+                    <label className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                      Annual Salary
+                    </label>
+
+                    <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600">
+                      ₹{filter.salary}L
+                    </span>
+
+                  </div>
+
+                  <input
+                    type="range"
+                    name="salary"
+                    min="0"
+                    max="100"
+                    value={filter.salary}
+                    onChange={handleFilterChange}
+                    className="w-full accent-blue-600"
+                  />
+
+                  <div className="mt-1 flex justify-between text-[11px] text-slate-400">
+                    <span>₹0L</span>
+                    <span>₹50L</span>
+                    <span>₹100L</span>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </aside>
+
+          {/* ================= RESULTS ================= */}
+
+          <main className="min-w-0 flex-1">
+
+            {/* Mobile Filters */}
+
+            <div className="mb-4 lg:hidden">
+
+              <button
+                onClick={() => setIsFilterVisible(true)}
+                className="
+                  flex w-full items-center justify-center gap-2
+                  rounded-xl
+                  border border-gray-200
+                  bg-white
+                  px-4 py-3
+                  text-sm font-semibold text-slate-700
+                  shadow-sm
+                  transition
+                  hover:border-blue-300
+                  hover:text-blue-600
+                "
+              >
+
+                <SlidersHorizontal size={18} />
+
+                <span>Filters</span>
+
+                <span className="ml-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-600">
+                  {filteredJobs.length}
+                </span>
+
+              </button>
+
+            </div>
+
+            {/* Results Header */}
+
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+              <div>
+
+                <p className="text-sm font-semibold text-slate-900">
+                  {filteredJobs.length} jobs found
+                </p>
+
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Browse roles that match your career goals.
+                </p>
+
+              </div>
+
+              {(filter.category ||
+                filter.location ||
+                filter.experience) && (
+                <button
+                  onClick={clearFilters}
+                  className="
+                    self-start
+                    rounded-lg
+                    bg-blue-50
+                    px-3 py-2
+                    text-xs font-semibold text-blue-600
+                    transition
+                    hover:bg-blue-100
+                    sm:self-auto
+                  "
+                >
+                  Clear filters
+                </button>
+              )}
+
+            </div>
+
+            {/* ================= JOB LIST ================= */}
+
+            <div className="space-y-4">
+
+              {filteredJobs.length > 0 ? (
+
+                filteredJobs.map((job: any) => (
+
+                  <article
+                    key={job._id}
+                    className="
+                      group
+                      rounded-2xl
+                      border border-gray-200
+                      bg-white
+                      p-4
+                      shadow-sm
+                      transition-all duration-200
+                      hover:-translate-y-0.5
+                      hover:border-blue-200
+                      hover:shadow-md
+                      sm:p-5
+                    "
+                  >
+
+                    {/* Top Section */}
+
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+                      <div className="min-w-0">
+
+                        <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
+
+                          <ArrowUpRight size={13} />
+
+                          Actively Hiring
+
+                        </div>
+
+                        <h2 className="text-lg font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-600 sm:text-xl">
+                          {job.title}
+                        </h2>
+
+                        <p className="mt-1 text-sm font-medium text-slate-500">
+                          {job.company}
+                        </p>
+
+                      </div>
+
+                      <span className="self-start rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
                         Job
                       </span>
-                      <div className="flex items-center space-x-1 text-green-600">
-                        <Clock h-4 w-4 />
-                        <span className="text-sm">Posted recently</span>
-                      </div>
+
                     </div>
-                    <Link
-                      href={`/detailjob/${job._id}`}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      View detail
-                    </Link>
+
+                    {/* Job Details */}
+
+                    <div className="mt-5 grid grid-cols-1 gap-3 border-t border-gray-100 pt-4 sm:grid-cols-3">
+
+                      {/* Start Date */}
+
+                      <div className="flex min-w-0 items-center gap-3 rounded-xl bg-slate-50 p-3">
+
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+
+                          <PlayCircle
+                            size={17}
+                            className="text-blue-600"
+                          />
+
+                        </div>
+
+                        <div className="min-w-0">
+
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            Start Date
+                          </p>
+
+                          <p className="truncate text-sm font-semibold text-slate-700">
+                            {job.startDate || "Not specified"}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      {/* Location */}
+
+                      <div className="flex min-w-0 items-center gap-3 rounded-xl bg-slate-50 p-3">
+
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+
+                          <FaLocationDot
+                            size={15}
+                            className="text-blue-600"
+                          />
+
+                        </div>
+
+                        <div className="min-w-0">
+
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            Location
+                          </p>
+
+                          <p className="truncate text-sm font-semibold text-slate-700">
+                            {job.location || "Not specified"}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      {/* CTC */}
+
+                      <div className="flex min-w-0 items-center gap-3 rounded-xl bg-slate-50 p-3">
+
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+
+                          <DollarSign
+                            size={17}
+                            className="text-blue-600"
+                          />
+
+                        </div>
+
+                        <div className="min-w-0">
+
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            CTC
+                          </p>
+
+                          <p className="truncate text-sm font-semibold text-slate-700">
+                            {job.CTC || "Not specified"}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    {/* Bottom */}
+
+                    <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+
+                      <div className="flex flex-wrap items-center gap-2">
+
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                          Job
+                        </span>
+
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-green-600">
+
+                          <Clock size={14} />
+
+                          Posted recently
+
+                        </div>
+
+                      </div>
+
+                      <Link
+                        href={`/detailJob/${job._id}`}
+                        className="
+                          inline-flex
+                          w-full
+                          items-center
+                          justify-center
+                          gap-1
+                          rounded-xl
+                          bg-blue-600
+                          px-4 py-2.5
+                          text-sm font-semibold text-white
+                          transition-all duration-200
+                          hover:bg-blue-700
+                          sm:w-auto
+                        "
+                      >
+                        View details
+                        <ArrowUpRight size={16} />
+                      </Link>
+
+                    </div>
+
+                  </article>
+
+                ))
+
+              ) : (
+
+                /* ================= EMPTY STATE ================= */
+
+                <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-5 py-14 text-center">
+
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+
+                    <BriefcaseBusiness
+                      size={24}
+                      className="text-blue-600"
+                    />
+
                   </div>
+
+                  <h3 className="mt-4 text-lg font-bold text-slate-900">
+                    No jobs found
+                  </h3>
+
+                  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                    Try changing your category, location or
+                    experience filters to find more jobs.
+                  </p>
+
+                  <button
+                    onClick={clearFilters}
+                    className="
+                      mt-5
+                      rounded-xl
+                      bg-blue-600
+                      px-5 py-2.5
+                      text-sm font-semibold text-white
+                      transition
+                      hover:bg-blue-700
+                    "
+                  >
+                    Clear filters
+                  </button>
+
                 </div>
-              ))}
+
+              )}
+
             </div>
-          </div>
+
+          </main>
+
         </div>
+
       </div>
-      {/* Mobile Filters Modal */}
-      {isFiltervisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden">
-          <div className="bg-white h-full w-full max-w-sm ml-auto p-6 overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold">Filters</h2>
-              <button
-                onClick={() => setisFiltervisible(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="space-y-6">
-              {/* Profile/Category Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  name="category"
-                  value={filter.category}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. Marketing Intern"
-                />
-              </div>
-              {/* Location Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  name="location"
-                  value={filter.location}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700"
-                  placeholder="e.g. Mumbai"
-                />
+
+      {/* ================= MOBILE FILTER DRAWER ================= */}
+
+      {isFilterVisible && (
+        <div className="fixed inset-0 z-[100] lg:hidden">
+
+          {/* Overlay */}
+
+          <button
+            type="button"
+            aria-label="Close filters"
+            onClick={() => setIsFilterVisible(false)}
+            className="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px]"
+          />
+
+          {/* Drawer */}
+
+          <div
+            className="
+              absolute right-0 top-0
+              h-full
+              w-[88%]
+              max-w-sm
+              overflow-y-auto
+              bg-white
+              shadow-2xl
+              sm:w-[380px]
+            "
+          >
+
+            {/* Header */}
+
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
+
+              <div className="flex items-center gap-3">
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50">
+
+                  <Filter
+                    size={18}
+                    className="text-blue-600"
+                  />
+
+                </div>
+
+                <div>
+
+                  <h2 className="text-base font-bold text-slate-900">
+                    Filters
+                  </h2>
+
+                  <p className="text-xs text-slate-400">
+                    Refine your job search
+                  </p>
+
+                </div>
+
               </div>
 
+              <button
+                onClick={() => setIsFilterVisible(false)}
+                className="
+                  flex h-9 w-9
+                  items-center justify-center
+                  rounded-full
+                  bg-slate-100
+                  text-slate-500
+                  transition
+                  hover:bg-slate-200
+                "
+              >
+                <X size={19} />
+              </button>
+
+            </div>
+
+            {/* Drawer Content */}
+
+            <div className="space-y-6 p-5">
+
+              {/* Category */}
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Category
+                </label>
+
+                <div className="relative">
+
+                  <Search
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+
+                  <input
+                    type="text"
+                    name="category"
+                    value={filter.category}
+                    onChange={handleFilterChange}
+                    placeholder="e.g. Engineering"
+                    className="
+                      w-full rounded-xl
+                      border border-gray-200
+                      bg-gray-50
+                      py-3 pl-9 pr-3
+                      text-sm text-slate-700
+                      outline-none
+                      focus:border-blue-400
+                      focus:bg-white
+                      focus:ring-4
+                      focus:ring-blue-50
+                    "
+                  />
+
+                </div>
+
+              </div>
+
+              {/* Location */}
+
+              <div>
+
+                <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Location
+                </label>
+
+                <div className="relative">
+
+                  <MapPin
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+
+                  <input
+                    type="text"
+                    name="location"
+                    value={filter.location}
+                    onChange={handleFilterChange}
+                    placeholder="e.g. Mumbai"
+                    className="
+                      w-full rounded-xl
+                      border border-gray-200
+                      bg-gray-50
+                      py-3 pl-9 pr-3
+                      text-sm text-slate-700
+                      outline-none
+                      focus:border-blue-400
+                      focus:bg-white
+                      focus:ring-4
+                      focus:ring-blue-50
+                    "
+                  />
+
+                </div>
+
+              </div>
+
+              {/* Experience */}
+
+              <div>
+
+                <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
                   Experience
                 </label>
+
                 <input
                   type="text"
                   name="experience"
                   value={filter.experience}
-                  onChange={handlefilterchange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  onChange={handleFilterChange}
                   placeholder="e.g. 1 year"
+                  className="
+                    w-full rounded-xl
+                    border border-gray-200
+                    bg-gray-50
+                    py-3 px-3
+                    text-sm text-slate-700
+                    outline-none
+                    focus:border-blue-400
+                    focus:bg-white
+                    focus:ring-4
+                    focus:ring-blue-50
+                  "
                 />
+
               </div>
 
-              {/* Checkboxes */}
-              <div className="space-y-3">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="workFromHome"
-                    checked={filter.workFromHome}
-                    onChange={handlefilterchange}
-                    className="h-4 w-4 text-blue-600 rounded "
-                  />
-                  <span className="text-gray-700">Work from home</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="partTime"
-                    checked={filter.partTime}
-                    onChange={handlefilterchange}
-                    className="h-4 w-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-700">Part-time</span>
-                </label>
-              </div>
+              {/* Work Preferences */}
 
-              {/* Stipend Range */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Annual Salary (₹ in lakhs)
+
+                <label className="mb-3 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Work preferences
                 </label>
+
+                <div className="space-y-2">
+
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-100 p-3 hover:bg-slate-50">
+
+                    <input
+                      type="checkbox"
+                      name="workFromHome"
+                      checked={filter.workFromHome}
+                      onChange={handleFilterChange}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                    />
+
+                    <span className="text-sm font-medium text-slate-700">
+                      Work From Home
+                    </span>
+
+                  </label>
+
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-100 p-3 hover:bg-slate-50">
+
+                    <input
+                      type="checkbox"
+                      name="partTime"
+                      checked={filter.partTime}
+                      onChange={handleFilterChange}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                    />
+
+                    <span className="text-sm font-medium text-slate-700">
+                      Part-time
+                    </span>
+
+                  </label>
+
+                </div>
+
+              </div>
+
+              {/* Salary */}
+
+              <div>
+
+                <div className="mb-2 flex items-center justify-between">
+
+                  <label className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Annual Salary
+                  </label>
+
+                  <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600">
+                    ₹{filter.salary}L
+                  </span>
+
+                </div>
+
                 <input
                   type="range"
                   name="salary"
                   min="0"
                   max="100"
                   value={filter.salary}
-                  onChange={handlefilterchange}
-                  className="w-full"
+                  onChange={handleFilterChange}
+                  className="w-full accent-blue-600"
                 />
-                <div className="flex justify-between text-sm text-gray-600">
+
+                <div className="mt-1 flex justify-between text-xs text-slate-400">
                   <span>₹0L</span>
                   <span>₹50L</span>
                   <span>₹100L</span>
                 </div>
+
               </div>
+
             </div>
+
+            {/* Drawer Footer */}
+
+            <div className="sticky bottom-0 border-t border-gray-100 bg-white p-4">
+
+              <div className="flex gap-3">
+
+                <button
+                  onClick={clearFilters}
+                  className="
+                    flex-1
+                    rounded-xl
+                    border border-gray-200
+                    px-4 py-3
+                    text-sm font-semibold text-slate-700
+                    hover:bg-slate-50
+                  "
+                >
+                  Clear all
+                </button>
+
+                <button
+                  onClick={() => setIsFilterVisible(false)}
+                  className="
+                    flex-1
+                    rounded-xl
+                    bg-blue-600
+                    px-4 py-3
+                    text-sm font-semibold text-white
+                    hover:bg-blue-700
+                  "
+                >
+                  Show results
+                </button>
+
+              </div>
+
+            </div>
+
           </div>
+
         </div>
       )}
+
     </div>
   );
 };
 
-export default index;
+export default Index;

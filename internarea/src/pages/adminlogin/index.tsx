@@ -1,24 +1,34 @@
 import axios from "axios";
-import { User, Lock } from "lucide-react";
+import { User, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-const index = () => {
+const AdminLogin = () => {
   const [formdata, setformdata] = useState({
     username: "",
     password: "",
   });
-  const router = useRouter();
+
   const [isloading, setisloading] = useState(false);
-  const handlechange = (e: any) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
+
+  const handlechange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
+
     setformdata((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
-  const handlesubmit = async (e: React.FormEvent) => {
+
+  const handlesubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     if (!formdata.username || !formdata.password) {
@@ -29,9 +39,9 @@ const index = () => {
     try {
       setisloading(true);
 
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/admin/adminlogin",
-        formdata,
+        formdata
       );
 
       toast.success("Logged in successfully");
@@ -40,85 +50,175 @@ const index = () => {
         router.push("/adminpanel");
       }, 1000);
     } catch (error) {
-      console.log(error);
+      console.error("Admin login error:", error);
       toast.error("Invalid credentials");
     } finally {
       setisloading(false);
     }
   };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Admin Login</h2>
-          <p className="mt-2 text-sm text-gray-500">
-            Access the admin dashboard to manage internships and applications
-          </p>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-8 sm:px-6">
+
+      {/* Background decoration */}
+
+      <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-blue-600/20 blur-3xl" />
+      <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-indigo-600/20 blur-3xl" />
+
+      {/* Login Card */}
+
+      <div className="relative w-full max-w-md">
+
+        {/* Security badge */}
+
+        <div className="mb-5 flex justify-center">
+          <div className="flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-xs font-semibold text-blue-300">
+            <ShieldCheck className="h-4 w-4" />
+            Secure Admin Portal
+          </div>
         </div>
 
-        <form className="space-y-6" onSubmit={handlesubmit}>
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700 mb-2"
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white shadow-2xl">
+
+          {/* Header */}
+
+          <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 px-6 py-8 text-center text-white sm:px-8 sm:py-10">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 shadow-lg backdrop-blur">
+              <ShieldCheck className="h-8 w-8" />
+            </div>
+
+            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+              Admin Login
+            </h1>
+
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-blue-100">
+              Sign in to manage internships, jobs and applications.
+            </p>
+          </div>
+
+          {/* Form */}
+
+          <div className="p-5 sm:p-8">
+            <form
+              className="space-y-5"
+              onSubmit={handlesubmit}
             >
-              Username
-            </label>
-            <div className="relative">
-              <User
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formdata.username}
-                onChange={handlechange}
-                placeholder="Enter Your Username"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+
+              {/* Username */}
+
+              <div>
+                <label
+                  htmlFor="username"
+                  className="mb-2 block text-sm font-semibold text-slate-700"
+                >
+                  Username
+                </label>
+
+                <div className="relative">
+                  <User
+                    size={18}
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formdata.username}
+                    onChange={handlechange}
+                    placeholder="Enter your username"
+                    autoComplete="username"
+                    className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-900 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="mb-2 block text-sm font-semibold text-slate-700"
+                >
+                  Password
+                </label>
+
+                <div className="relative">
+                  <Lock
+                    size={18}
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    value={formdata.password}
+                    onChange={handlechange}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-12 text-sm text-slate-900 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowPassword((prev) => !prev)
+                    }
+                    aria-label={
+                      showPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                    className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                  >
+                    {showPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit */}
+
+              <button
+                type="submit"
+                disabled={isloading}
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
+              >
+                {isloading && (
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                )}
+
+                {isloading
+                  ? "Signing in..."
+                  : "Sign In to Admin Panel"}
+              </button>
+            </form>
+
+            {/* Security note */}
+
+            <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+
+                <p className="text-xs leading-5 text-slate-500">
+                  This area is restricted to authorized administrators.
+                  Keep your login credentials secure.
+                </p>
+              </div>
             </div>
           </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <Lock
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formdata.password}
-                onChange={handlechange}
-                placeholder="Enter Your Password"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-          <div>
-            <button
-              type="submit"
-              disabled={isloading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-3 rounded-lg font-semibold flex justify-center items-center gap-2 transition"
-            >
-              {isloading && (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              )}
-              {isloading ? "Signing in..." : "Sign In"}
-            </button>
-          </div>
-        </form>
+        </div>
+
+        <p className="mt-5 text-center text-xs text-slate-500">
+          Admin Portal
+        </p>
       </div>
-    </div>
+    </main>
   );
 };
 
-export default index;
+export default AdminLogin;

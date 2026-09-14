@@ -1,3 +1,5 @@
+"use client";
+
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -5,65 +7,106 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { pdf } from "@react-pdf/renderer";
 import ResumeDocument from "../pdf/ResumeDocument";
-import { Key } from "lucide-react";
-import handler from "../api/hello";
 import toast from "react-hot-toast";
+import {
+  Award,
+  Briefcase,
+  CheckCircle2,
+  Clock,
+  Download,
+  ExternalLink,
+  FileText,
+  FolderGit2,
+  GraduationCap,
+  Heart,
+  Languages,
+  Link as LinkIcon,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  User,
+  X,
+} from "lucide-react";
 
-const view = () => {
+const ViewResume = () => {
   const router = useRouter();
   const user = useSelector(selectuser);
+
   const [resume, setResume] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isPaid, setIsPaid] = useState(false);
+
   const [showOtpModel, setShowOtpModel] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [paymentEmail, setPaymentEmail] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+
+  /* ---------------- FETCH RESUME ---------------- */
 
   useEffect(() => {
     const fetchResume = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/resume/${user.id}`,
+          `http://localhost:5000/api/resume/${user.id}`
         );
+
         setResume(res.data.resume);
-        setIsPaid(res.data.resume.PaymentStatus);
+        setIsPaid(Boolean(res.data.resume?.PaymentStatus));
       } catch (error) {
         console.log(error);
+        setResume(null);
       } finally {
         setLoading(false);
       }
     };
-    if (user?.id) {
-      fetchResume();
-    }
+
+    fetchResume();
   }, [user]);
 
+  /* ---------------- DOWNLOAD PDF ---------------- */
+
   const downloadPDF = async () => {
+    if (!resume || !user?.id) {
+      toast.error("Resume information is missing");
+      return;
+    }
+
     try {
+      toast.loading("Preparing your resume...", {
+        id: "resume-download",
+      });
+
       let photo = null;
 
       if (resume.photo) {
         const response = await fetch(
-          `http://localhost:5000/uploads/profilePhoto/${resume.photo}`,
+          `http://localhost:5000/uploads/profilePhoto/${resume.photo}`
         );
 
         const blob = await response.blob();
 
         photo = await new Promise((resolve) => {
           const reader = new FileReader();
+
           reader.onloadend = () => resolve(reader.result);
+
           reader.readAsDataURL(blob);
         });
       }
 
-      console.log(ResumeDocument);
       const blob = await pdf(
         <ResumeDocument
           resume={{
             ...resume,
             photo,
           }}
-        />,
+        />
       ).toBlob();
 
       const formData = new FormData();
@@ -72,7 +115,7 @@ const view = () => {
         "resume",
         new File([blob], `${resume.fullname}_Resume.pdf`, {
           type: "application/pdf",
-        }),
+        })
       );
 
       formData.append("userId", user.id);
@@ -84,7 +127,7 @@ const view = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        },
+        }
       );
 
       const url = URL.createObjectURL(blob);
@@ -92,53 +135,87 @@ const view = () => {
       const link = document.createElement("a");
       link.href = url;
       link.download = `${resume.fullname}_Resume.pdf`;
+
+      document.body.appendChild(link);
       link.click();
+      link.remove();
 
       URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
+
+      toast.success("Resume downloaded successfully", {
+        id: "resume-download",
+      });
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Failed to generate or download resume", {
+        id: "resume-download",
+      });
     }
   };
 
+  /* ---------------- PAYMENT ---------------- */
+
   const handlePayment = async () => {
+    if (!user?.id) {
+      toast.error("Please login first");
+      return;
+    }
+
     try {
+      setPaymentLoading(true);
+
       const res = await axios.post(
         "http://localhost:5000/api/payment/send-otp",
         {
           userId: user.id,
-        },
+        }
       );
+
       if (res.data.success) {
         setPaymentEmail(res.data.email);
+        setOtp(["", "", "", "", "", ""]);
         setShowOtpModel(true);
+
         toast.success("OTP sent to your registered email");
       }
     } catch (error) {
       console.log(error);
       toast.error("Failed to send OTP");
+    } finally {
+      setPaymentLoading(false);
     }
   };
 
   const verifyOtpAndPay = async () => {
+    if (otp.join("").length !== 6) {
+      toast.error("Please enter the complete 6-digit OTP");
+      return;
+    }
+
     try {
+      setPaymentLoading(true);
+
       const verifyOtp = await axios.post(
         "http://localhost:5000/api/payment/verify-otp",
         {
           email: paymentEmail,
           otp: otp.join(""),
-        },
+        }
       );
+
       if (!verifyOtp.data.success) {
         toast.error("Invalid OTP");
         return;
       }
+
       setShowOtpModel(false);
 
       const { data } = await axios.post(
         "http://localhost:5000/api/payment/create-order",
         {
           userId: user.id,
-        },
+        }
       );
 
       const options = {
@@ -156,318 +233,528 @@ const view = () => {
               {
                 ...response,
                 userId: user.id,
-              },
+              }
             );
+
             if (verify.data.success) {
               toast.success("Payment Successful!");
+
               const res = await axios.get(
-                `http://localhost:5000/api/resume/${user.id}`,
+                `http://localhost:5000/api/resume/${user.id}`
               );
+
               setResume(res.data.resume);
               setIsPaid(true);
-              toast.success("Payment Successful!");
             }
           } catch (error) {
             console.error(error);
             toast.error("Payment verification failed");
           }
         },
+
         prefill: {
-          name: resume.fullname,
-          email: resume.email,
-          contact: resume.phone,
+          name: resume?.fullname,
+          email: resume?.email,
+          contact: resume?.phone,
         },
+
         theme: {
           color: "#2563EB",
+        },
+
+        modal: {
+          ondismiss: () => {
+            setPaymentLoading(false);
+          },
         },
       };
 
       const razorpay = new (window as any).Razorpay(options);
+
       razorpay.open();
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.message || "OTP verification failed");
+
+      toast.error(
+        error.response?.data?.message ||
+          "OTP verification failed"
+      );
+    } finally {
+      setPaymentLoading(false);
     }
   };
 
+  /* ---------------- LOADING ---------------- */
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300">
-        <div className="bg-white shadow-2xl rounded-2xl px-10 py-8 flex flex-col items-center">
-          <div className="w-14 h-14 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <h2 className="mt-5 text-2xl font-bold text-gray-800">
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-100 shadow-lg p-7 text-center">
+          <div className="mx-auto w-12 h-12 rounded-full border-4 border-gray-200 border-t-blue-600 animate-spin" />
+
+          <h2 className="mt-5 text-xl font-bold text-gray-900">
             Loading Resume...
           </h2>
-          <p className="text-gray-500 mt-2">
+
+          <p className="mt-2 text-sm text-gray-500">
             Please wait while we fetch your resume.
           </p>
         </div>
-      </div>
+      </main>
     );
   }
 
+  /* ---------------- NO RESUME ---------------- */
+
   if (!resume) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300">
-        <div className="bg-white shadow-xl rounded-2xl px-10 py-10 text-center max-w-md">
-          <div className="text-6xl mb-4">📄</div>
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-md bg-white rounded-2xl border border-gray-100 shadow-lg p-7 sm:p-9 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50">
+            <FileText className="h-8 w-8 text-blue-600" />
+          </div>
 
-          <h2 className="text-3xl font-bold text-gray-800">No Resume Found</h2>
-          <p className="text-gray-500 mt-3 mb-6">
-            You haven't created a resume yet. Build one to showcase your skills
-            and experience.
+          <h2 className="mt-5 text-2xl font-bold text-gray-900">
+            No Resume Found
+          </h2>
+
+          <p className="mt-3 text-sm sm:text-base text-gray-500 leading-relaxed">
+            You haven't created a resume yet. Build one to showcase
+            your skills and experience.
           </p>
+
           <button
-            onClick={() => (window.location.href = "/resume")}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+            onClick={() => router.push("/resume")}
+            className="mt-6 w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
           >
             Create Resume
           </button>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 py-12 px-4">
-      <div className="max-w-5xl mx-auto flex justify-end mb-5">
-        {isPaid ? (
-          <button
-            onClick={downloadPDF}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            Download Resume
-          </button>
-        ) : (
-          <button
-            onClick={handlePayment}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            Pay ₹50
-          </button>
-        )}
+    <main className="min-h-screen bg-gray-50 px-3 sm:px-5 py-6 sm:py-10">
+      {/* ACTION BAR */}
+      <div className="w-full max-w-5xl mx-auto mb-5">
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+                <FileText className="h-5 w-5 text-blue-600" />
+              </div>
+
+              <div>
+                <p className="font-semibold text-gray-900">
+                  Resume Preview
+                </p>
+
+                <p className="text-xs text-gray-500">
+                  {isPaid
+                    ? "Your resume is ready to download."
+                    : "Purchase access to download your PDF."}
+                </p>
+              </div>
+            </div>
+
+            {isPaid ? (
+              <button
+                onClick={downloadPDF}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold transition active:scale-[0.98]"
+              >
+                <Download size={18} />
+                Download Resume
+              </button>
+            ) : (
+              <button
+                onClick={handlePayment}
+                disabled={paymentLoading}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <ShieldCheck size={18} />
+
+                {paymentLoading
+                  ? "Please wait..."
+                  : "Pay ₹50"}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="max-w-5xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
-        <div className="grid md:grid-cols-3">
-          {/* LEFT */}
-          <div className="bg-gradient-to-b from-slate-900 to-slate-700 text-white p-8">
-            <div className="flex justify-center mb-8">
+
+      {/* RESUME */}
+      <div className="w-full max-w-5xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3">
+          {/* LEFT SIDEBAR */}
+          <aside className="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white p-5 sm:p-7 md:p-8">
+            {/* Profile */}
+            <div className="flex flex-col items-center mb-8">
               {resume.photo ? (
                 <img
                   src={`http://localhost:5000/uploads/profilePhoto/${resume.photo}`}
                   alt="Profile"
-                  className="w-40 h-40 rounded-full object-cover border-4 border-white shadow-xl"
+                  className="w-28 h-28 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-white shadow-xl"
                 />
               ) : (
-                <div className=" flex w-40 h-40 rounded-full bg-slate-500 justify-center items-center">
-                  <p className="text-gray-200">Profile Picture</p>
+                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-slate-700 border-4 border-slate-500 flex items-center justify-center">
+                  <User className="w-12 h-12 text-slate-300" />
                 </div>
               )}
+
+              <h2 className="mt-4 text-xl font-bold text-center break-words">
+                {resume.fullname}
+              </h2>
             </div>
 
             {/* Contact */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold uppercase tracking-wide border-b border-gray-400 pb-2 mb-4 text-sl">
-                Contact
-              </h2>
+            <SidebarSection title="Contact">
+              <div className="space-y-3 text-sm text-slate-200">
+                {resume.email && (
+                  <div className="flex items-start gap-2">
+                    <Mail className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                    <span className="break-all">
+                      {resume.email}
+                    </span>
+                  </div>
+                )}
 
-              <div className="space-y-2 text-sm text-gray-200 wrap-break-word">
-                <p>{resume.email}</p>
-                <p>{resume.phone}</p>
-                <p>{resume.address}</p>
-                <p>{resume.linkedin}</p>
-                <p>{resume.github}</p>
-                <p>{resume.portfolio}</p>
+                {resume.phone && (
+                  <div className="flex items-start gap-2">
+                    <Phone className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                    <span className="break-words">
+                      {resume.phone}
+                    </span>
+                  </div>
+                )}
+
+                {resume.address && (
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                    <span className="break-words">
+                      {resume.address}
+                    </span>
+                  </div>
+                )}
+
+                {resume.linkedin && (
+                  <div className="flex items-start gap-2">
+                    <LinkIcon className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                    <span className="break-all">
+                      {resume.linkedin}
+                    </span>
+                  </div>
+                )}
+
+                {resume.github && (
+                  <div className="flex items-start gap-2">
+                    <LinkIcon className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                    <span className="break-all">
+                      {resume.github}
+                    </span>
+                  </div>
+                )}
+
+                {resume.portfolio && (
+                  <div className="flex items-start gap-2">
+                    <ExternalLink className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                    <span className="break-all">
+                      {resume.portfolio}
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
+            </SidebarSection>
 
-            {/* SKILLS */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold uppercase tracking-wider border-b border-gray-400 pb-2 mb-4">
-                Skills
-              </h2>
-
+            {/* Skills */}
+            <SidebarSection
+              title="Skills"
+              icon={<CodeIcon />}
+            >
               <div className="flex flex-wrap gap-2">
-                {resume.skills.map((skill: any, i: any) => (
-                  <span
-                    key={i}
-                    className="bg-white/10 px-3 py-1 rounded-full text-sm hover:bg-white/20 transition"
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {(resume.skills || []).map(
+                  (skill: string, i: number) => (
+                    <span
+                      key={i}
+                      className="bg-white/10 border border-white/10 px-3 py-1.5 rounded-full text-xs sm:text-sm text-slate-100"
+                    >
+                      {skill}
+                    </span>
+                  )
+                )}
               </div>
-            </div>
+            </SidebarSection>
 
-            {/* Language */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold uppercase tracking-wider border-b border-gray-400 pb-2 mb-4">
-                Languages
-              </h2>
-
-              {resume.languages.map((lan: any, i: any) => (
-                <p className="mb-1" key={i}>
-                  • {lan}
-                </p>
-              ))}
-            </div>
+            {/* Languages */}
+            <SidebarSection
+              title="Languages"
+              icon={<Languages className="w-4 h-4" />}
+            >
+              <div className="space-y-1.5 text-sm text-slate-200">
+                {(resume.languages || []).map(
+                  (language: string, i: number) => (
+                    <p key={i}>• {language}</p>
+                  )
+                )}
+              </div>
+            </SidebarSection>
 
             {/* Interests */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold uppercase tracking-wider border-b border-gray-400 pb-2 mb-4">
-                Interests
-              </h2>
-              {resume.interests.split(",").map((interests: any, i: any) => (
-                <p key={i} className="mb-1">
-                  • {interests}
-                </p>
-              ))}
-            </div>
-          </div>
+            <SidebarSection
+              title="Interests"
+              icon={<Heart className="w-4 h-4" />}
+            >
+              <div className="space-y-1.5 text-sm text-slate-200">
+                {(resume.interests || "")
+                  .split(",")
+                  .map((interest: string, i: number) => {
+                    const value = interest.trim();
 
-          {/* RIGHT */}
-          <div className="md:col-span-2 p-10">
-            <div className="mb-10">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
+                    if (!value) return null;
+
+                    return (
+                      <p key={i}>• {value}</p>
+                    );
+                  })}
+              </div>
+            </SidebarSection>
+          </aside>
+
+          {/* RIGHT CONTENT */}
+          <div className="md:col-span-2 p-5 sm:p-7 md:p-10">
+            {/* Name */}
+            <div className="mb-8 sm:mb-10">
+              <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 mb-2">
+                Professional Resume
+              </p>
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight break-words">
                 {resume.fullname}
               </h1>
-              <div className="h-1 bg-blue-600 w-32 rounded-full"></div>
+
+              <div className="mt-3 h-1 w-20 sm:w-28 bg-blue-600 rounded-full" />
             </div>
 
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold text-slate-800 border-b-2 border-blue-600 pb-2 mb-5">
-                Career Objective
-              </h2>
-              <p className="text-gray-700 leading-relaxed">
-                {resume.objective}
+            {/* Objective */}
+            <ResumeSection
+              title="Career Objective"
+            >
+              <p className="text-gray-700 leading-7 text-sm sm:text-base">
+                {resume.objective || "Not provided."}
               </p>
-            </section>
+            </ResumeSection>
 
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold text-slate-800 border-b-2 border-blue-600 pb-2 mb-5">
-                Education
-              </h2>
-              {resume.education.map((edu: any, i: any) => (
-                <div key={i} className="mb-6 pl-4 border-l-4 border-blue-500">
-                  <h3 className="font-bold text-lg text-slate-900">
-                    {edu.college}
-                  </h3>
+            {/* Education */}
+            <ResumeSection
+              title="Education"
+              icon={<GraduationCap className="w-5 h-5" />}
+            >
+              {(resume.education || []).map(
+                (edu: any, i: number) => (
+                  <div
+                    key={i}
+                    className="mb-6 last:mb-0 pl-4 border-l-4 border-blue-500"
+                  >
+                    <h3 className="font-bold text-base sm:text-lg text-slate-900 break-words">
+                      {edu.college}
+                    </h3>
 
-                  <p className="text-slate-800">{edu.degree}</p>
-                  <p className="text-slate-800">{edu.branch}</p>
-                  <p className="text-slate-800">CGPA: {edu.cgpa}</p>
-                  <p className="text-slate-800">
-                    {edu.startYear} - {edu.endYear}
-                  </p>
-                </div>
-              ))}
-            </section>
+                    {edu.degree && (
+                      <p className="text-gray-700 mt-1">
+                        {edu.degree}
+                      </p>
+                    )}
 
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold text-slate-800 border-b-2 border-blue-600 pb-2 mb-5">
-                Experience
-              </h2>
+                    {edu.branch && (
+                      <p className="text-gray-700">
+                        {edu.branch}
+                      </p>
+                    )}
 
-              {resume.experience.map((exp: any, i: any) => (
-                <div key={i} className="mb-6 pl-4 border-l-4 border-blue-500">
-                  <h3 className="font-bold text-lg text-slate-900">
-                    {exp.company}
-                  </h3>
-                  <p className="text-slate-800">{exp.position}</p>
-                  <p className="text-slate-800">{exp.duration}</p>
-                  <p className="text-slate-800">{exp.description}</p>
-                </div>
-              ))}
-            </section>
+                    {edu.cgpa && (
+                      <p className="text-gray-700">
+                        CGPA: {edu.cgpa}
+                      </p>
+                    )}
 
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold text-slate-800 border-b-2 border-blue-600 pb-2 mb-5">
-                Projects
-              </h2>
+                    {(edu.startYear || edu.endYear) && (
+                      <div className="inline-flex items-center gap-1.5 mt-2 text-sm text-gray-500">
+                        <Clock className="w-4 h-4" />
+                        {edu.startYear} - {edu.endYear}
+                      </div>
+                    )}
+                  </div>
+                )
+              )}
+            </ResumeSection>
 
-              {resume.projects.map((proj: any, i: any) => (
-                <div key={i} className="mb-6 pl-4 border-l-4 border-blue-500">
-                  <h3 className="font-bold text-lg text-slate-900">
-                    {proj.title}
-                  </h3>
+            {/* Experience */}
+            <ResumeSection
+              title="Experience"
+              icon={<Briefcase className="w-5 h-5" />}
+            >
+              {(resume.experience || []).map(
+                (exp: any, i: number) => (
+                  <div
+                    key={i}
+                    className="mb-6 last:mb-0 pl-4 border-l-4 border-blue-500"
+                  >
+                    <h3 className="font-bold text-base sm:text-lg text-slate-900">
+                      {exp.company}
+                    </h3>
 
-                  <p className="text-slate-800">{proj.description}</p>
-                  <p className="text-slate-800 hover:text-blue-600">
-                    {proj.github}
-                  </p>
-                </div>
-              ))}
-            </section>
+                    {exp.position && (
+                      <p className="font-medium text-gray-700 mt-1">
+                        {exp.position}
+                      </p>
+                    )}
 
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold text-slate-800 border-b-2 border-blue-600 pb-2 mb-5">
-                Certifications
-              </h2>
-              {resume.certification.map((cert: any, i: any) => (
-                <p key={i} className="text-slate-800">
-                  • {cert}
-                </p>
-              ))}
-            </section>
+                    {exp.duration && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        {exp.duration}
+                      </p>
+                    )}
+
+                    {exp.description && (
+                      <p className="text-gray-700 leading-6 mt-2 text-sm sm:text-base">
+                        {exp.description}
+                      </p>
+                    )}
+                  </div>
+                )
+              )}
+            </ResumeSection>
+
+            {/* Projects */}
+            <ResumeSection
+              title="Projects"
+              icon={<FolderGit2 className="w-5 h-5" />}
+            >
+              {(resume.projects || []).map(
+                (project: any, i: number) => (
+                  <div
+                    key={i}
+                    className="mb-6 last:mb-0 pl-4 border-l-4 border-blue-500"
+                  >
+                    <h3 className="font-bold text-base sm:text-lg text-slate-900">
+                      {project.title}
+                    </h3>
+
+                    {project.description && (
+                      <p className="text-gray-700 leading-6 mt-2 text-sm sm:text-base">
+                        {project.description}
+                      </p>
+                    )}
+
+                    {project.github && (
+                      <p className="flex items-start gap-2 text-sm text-blue-600 mt-2 break-all">
+                        <LinkIcon className="w-4 h-4 mt-0.5 shrink-0" />
+                        {project.github}
+                      </p>
+                    )}
+                  </div>
+                )
+              )}
+            </ResumeSection>
+
+            {/* Certifications */}
+            <ResumeSection
+              title="Certifications"
+              icon={<Award className="w-5 h-5" />}
+            >
+              <div className="space-y-2 text-gray-700 text-sm sm:text-base">
+                {(resume.certification || []).map(
+                  (certification: string, i: number) => (
+                    <p key={i}>• {certification}</p>
+                  )
+                )}
+              </div>
+            </ResumeSection>
           </div>
         </div>
       </div>
+
+      {/* OTP MODAL */}
       {showOtpModel && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white w-[420px] rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4 py-6">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl p-5 sm:p-7">
+            {/* Close */}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowOtpModel(false);
+                  setOtp(["", "", "", "", "", ""]);
+                }}
+                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 transition"
+                aria-label="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
             {/* Header */}
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center text-3xl">
-                📧
+              <div className="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-blue-50">
+                <Mail className="w-7 h-7 text-blue-600" />
               </div>
 
-              <h2 className="text-2xl font-bold text-gray-800 mt-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mt-4">
                 Email Verification
               </h2>
 
-              <p className="text-gray-500 mt-2 text-sm">
+              <p className="text-gray-500 mt-2 text-sm leading-relaxed">
                 We've sent a 6-digit OTP to your registered email.
               </p>
 
-              <p className="text-blue-600 font-medium text-sm mt-1">
+              <p className="text-blue-600 font-semibold text-sm mt-2 break-all">
                 {paymentEmail}
               </p>
             </div>
 
-            {/* OTP Boxes */}
-            <div className="flex justify-center gap-3 mt-8 mb-8">
+            {/* OTP */}
+            <div className="flex justify-center gap-1.5 sm:gap-2 mt-7 mb-7">
               {otp.map((digit, index) => (
                 <input
                   key={index}
                   id={`otp-${index}`}
                   type="text"
+                  inputMode="numeric"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, "");
+                    const value = e.target.value.replace(
+                      /[^0-9]/g,
+                      ""
+                    );
 
                     const newOtp = [...otp];
                     newOtp[index] = value;
+
                     setOtp(newOtp);
 
                     if (value && index < 5) {
                       const next = document.getElementById(
-                        `otp-${index + 1}`,
+                        `otp-${index + 1}`
                       ) as HTMLInputElement;
 
                       next?.focus();
                     }
                   }}
                   onKeyDown={(e) => {
-                    if (e.key === "Backspace" && !otp[index] && index > 0) {
+                    if (
+                      e.key === "Backspace" &&
+                      !otp[index] &&
+                      index > 0
+                    ) {
                       const prev = document.getElementById(
-                        `otp-${index - 1}`,
+                        `otp-${index - 1}`
                       ) as HTMLInputElement;
 
                       prev?.focus();
                     }
                   }}
-                  className="text-gray-800 w-12 h-14 border-2 border-gray-300 rounded-xl text-center text-xl font-bold outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
+                  className="w-10 h-12 sm:w-12 sm:h-14 border-2 border-gray-200 rounded-xl text-center text-lg sm:text-xl font-bold text-gray-900 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition"
                 />
               ))}
             </div>
@@ -475,18 +762,24 @@ const view = () => {
             {/* Buttons */}
             <div className="space-y-3">
               <button
+                type="button"
                 onClick={verifyOtpAndPay}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition"
+                disabled={paymentLoading}
+                className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Verify & Continue
+                {paymentLoading
+                  ? "Verifying..."
+                  : "Verify & Continue"}
               </button>
 
               <button
+                type="button"
                 onClick={() => {
                   setShowOtpModel(false);
                   setOtp(["", "", "", "", "", ""]);
                 }}
-                className="w-full border border-gray-300 hover:bg-gray-100 py-3 rounded-xl font-semibold transition text-gray-700"
+                disabled={paymentLoading}
+                className="w-full h-12 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold transition disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -494,8 +787,70 @@ const view = () => {
           </div>
         </div>
       )}
+    </main>
+  );
+};
+
+/* ---------------- SMALL COMPONENTS ---------------- */
+
+const SidebarSection = ({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) => {
+  return (
+    <div className="mb-8">
+      <div className="flex items-center gap-2 border-b border-slate-600 pb-2 mb-4">
+        {icon && (
+          <span className="text-slate-300">
+            {icon}
+          </span>
+        )}
+
+        <h2 className="text-sm font-bold uppercase tracking-wider text-white">
+          {title}
+        </h2>
+      </div>
+
+      {children}
     </div>
   );
 };
 
-export default view;
+const ResumeSection = ({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) => {
+  return (
+    <section className="mb-9 sm:mb-10">
+      <div className="flex items-center gap-2 border-b-2 border-blue-600 pb-2 mb-5">
+        {icon && (
+          <span className="text-blue-600">
+            {icon}
+          </span>
+        )}
+
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+          {title}
+        </h2>
+      </div>
+
+      {children}
+    </section>
+  );
+};
+
+const CodeIcon = () => (
+  <span className="text-xs font-bold">&lt;/&gt;</span>
+);
+
+export default ViewResume;

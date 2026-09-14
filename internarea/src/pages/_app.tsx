@@ -1,56 +1,88 @@
 import "@/styles/globals.css";
+
 import type { AppProps } from "next/app";
+import Script from "next/script";
+import { useEffect } from "react";
+import { Provider, useDispatch } from "react-redux";
+
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Fotter";
-import { store } from "../store/store";
-import { Provider, useDispatch } from "react-redux";
-import { useEffect } from "react";
 import { auth } from "@/firebase/firebase";
-import { login, logout } from "@/Feature/Userslice";
-import { ToastContainer } from "react-toastify";
+import { login } from "@/Feature/Userslice";
+import { store } from "../store/store";
+
 import { Toaster } from "react-hot-toast";
-import { UseDispatch } from "react-redux";
-import Script from "next/script";
 
-export default function App({ Component, pageProps }: AppProps) {
-  function AuthListener() {
-    const dispatch = useDispatch();
+function AuthListener() {
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-      const savedUser = localStorage.getItem("user");
+  useEffect(() => {
+    // Restore previously logged-in user
+    const savedUser = localStorage.getItem("user");
 
-      console.log("Saved User:", savedUser);
-
-      if (savedUser) {
+    if (savedUser) {
+      try {
         dispatch(login(JSON.parse(savedUser)));
-        console.log("Dispatched login");
+      } catch (error) {
+        console.error("Failed to restore saved user:", error);
+        localStorage.removeItem("user");
       }
+    }
 
-      const unsubscribe = auth.onAuthStateChanged((authuser) => {
-        console.log("Firebase user:", authuser);
+    // Firebase authentication listener
+    const unsubscribe = auth.onAuthStateChanged((authuser) => {
+      if (authuser) {
+        console.log("Firebase authentication active");
+      } else {
+        console.log("Firebase user signed out");
+      }
+    });
 
-        if (authuser) {
-          console.log("Firebase logged in");
-        } else {
-          console.log("Firebase NOT logged in");
-        }
-      });
+    return () => unsubscribe();
+  }, [dispatch]);
 
-      return () => unsubscribe();
-    }, []);
+  return null;
+}
 
-    return null;
-  }
-
+export default function App({
+  Component,
+  pageProps,
+}: AppProps) {
   return (
     <Provider store={store}>
       <AuthListener />
-      <div className="bg-white">
-        <Toaster position="top-right" />
-        <Script src="https://checkout.razorpay.com/v1/checkout.js"/>
-        <Navbar />
-        <Component {...pageProps} />
-        <Footer />
+
+      <div className="min-h-screen flex flex-col bg-white">
+
+        {/* Toast Notifications */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+          }}
+        />
+
+        {/* Razorpay Checkout */}
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="afterInteractive"
+        />
+
+        {/* Navbar */}
+        <header className="shrink-0">
+          <Navbar />
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 w-full">
+          <Component {...pageProps} />
+        </main>
+
+        {/* Footer */}
+        <footer className="shrink-0">
+          <Footer />
+        </footer>
+
       </div>
     </Provider>
   );

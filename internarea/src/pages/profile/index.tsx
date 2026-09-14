@@ -1,205 +1,285 @@
+"use client";
+
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
-import { ExternalLink, Mail, PhoneOutgoing, User, History } from "lucide-react";
+import {
+  ArrowRight,
+  ExternalLink,
+  History,
+  Mail,
+  Lock,
+  User,
+  FileText,
+} from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-interface User {
-  name: string;
-  email: string;
-  photo: string;
-}
-
-const index = () => {
-  // const [user, setUser] = useState<User | null>({
-  //   name: "Rahul",
-  //   email: "xyz@gmail.com",
-  //   photo:
-  //     "http://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=faces,",
-  // });
-
+const Index = () => {
   const user = useSelector(selectuser);
+
   const [resume, setResume] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchResume = async () => {
-      if (!user?.id) return;
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/resume/${user.id}`,
+          `http://localhost:5000/api/resume/${user.id}`
         );
+
         setResume(response.data.resume);
       } catch (error) {
         console.log("Resume not found");
+        setResume(null);
       } finally {
         setLoading(false);
       }
     };
+
     fetchResume();
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* Profile Header */}
-          <div className="relative h-32 bg-linear-to-r from-blue-500 to-blue-600">
-            <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
+    <main className="min-h-[calc(100vh-80px)] bg-gray-50 px-4 py-8 sm:py-12">
+      <div className="w-full max-w-4xl mx-auto">
+        {/* Profile Card */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          {/* Cover */}
+          <div className="relative h-28 sm:h-36 bg-linear-to-r from-blue-600 via-blue-500 to-indigo-600">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute -right-10 -top-20 w-60 h-60 rounded-full border-[40px] border-white" />
+            </div>
+
+            {/* Profile Image */}
+            <div className="absolute left-1/2 -bottom-12 -translate-x-1/2">
               {user?.photo ? (
                 <img
                   src={user.photo}
-                  alt={user.name}
-                  className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
+                  alt={user.name || "Profile"}
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-xl object-cover bg-gray-100"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-gray-200 flex items-center justify-center">
-                  <User className="h-12 w-12 text-gray-400" />
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-xl bg-gray-100 flex items-center justify-center">
+                  <User className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
                 </div>
               )}
             </div>
           </div>
 
-          {/* Profile content */}
-          <div className="pt-16 pb-8 px-6">
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
-              <div className="mt-2 flex items-center justify-center text-gray-500">
-                <Mail className="h-4 w-4 mr-2" />
-                <span>{user?.email}</span>
+          {/* Profile Information */}
+          <div className="pt-16 sm:pt-20 px-5 sm:px-8 pb-8">
+            <div className="text-center">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
+                {user?.name || "User"}
+              </h1>
+
+              <div className="mt-2 flex items-center justify-center gap-2 text-gray-500 text-sm sm:text-base break-all">
+                <Mail className="w-4 h-4 shrink-0" />
+                <span>{user?.email || "No email available"}</span>
               </div>
             </div>
 
-            {/* Profile details */}
-            <div className="space-y-6">
-              {/* Qucik Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <span className="text-blue-600 font-semibold text-2xl">
-                    0
-                  </span>
-                  <p className="text-blue-600 text-sm mt-1">
-                    Active Applications
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-8">
+              <div className="rounded-xl bg-blue-50 border border-blue-100 p-4 sm:p-5 text-center">
+                <span className="block text-2xl sm:text-3xl font-bold text-blue-600">
+                  0
+                </span>
+
+                <p className="mt-1 text-xs sm:text-sm font-medium text-blue-600">
+                  Active Applications
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-green-50 border border-green-100 p-4 sm:p-5 text-center">
+                <span className="block text-2xl sm:text-3xl font-bold text-green-600">
+                  0
+                </span>
+
+                <p className="mt-1 text-xs sm:text-sm font-medium text-green-600">
+                  Accepted Applications
+                </p>
+              </div>
+            </div>
+
+            {/* Applications */}
+            <section className="mt-8 border-t border-gray-100 pt-7">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                    Applications
+                  </h2>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Track your internship and job applications.
                   </p>
                 </div>
+              </div>
 
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <span className="text-green-600 font-semibold text-2xl">
-                    0
-                  </span>
-                  <p className="text-green-600 text-sm mt-1">
-                    Acceptedd Applications
+              <Link
+                href="/userapplication"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition active:scale-[0.99]"
+              >
+                View Applications
+                <ExternalLink className="w-4 h-4" />
+              </Link>
+            </section>
+
+            {/* Resume */}
+            <section className="mt-8 border-t border-gray-100 pt-7">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
+                  <FileText className="w-5 h-5 text-green-600" />
+                </div>
+
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                    Resume
+                  </h2>
+
+                  <p className="text-sm text-gray-500">
+                    Manage your professional resume.
                   </p>
                 </div>
               </div>
 
-              {/* Action */}
-              <div className="flex justify-center pt-4">
-                <Link
-                  href={"/userapplication"}
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                >
-                  View Applications
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Link>
+              {loading ? (
+                <div className="rounded-xl bg-gray-50 border border-gray-100 p-5 text-center">
+                  <p className="text-sm text-gray-500">
+                    Checking resume...
+                  </p>
+                </div>
+              ) : resume ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Link
+                    href="/resume/view"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold transition"
+                  >
+                    View Resume
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+
+                  <Link
+                    href="/resume/edit"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white font-semibold transition"
+                  >
+                    Edit Resume
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              ) : (
+                <div className="rounded-xl bg-gray-50 border border-gray-100 p-5 text-center">
+                  <FileText className="mx-auto w-9 h-9 text-gray-400 mb-3" />
+
+                  <p className="text-gray-600 font-medium">
+                    No resume created yet.
+                  </p>
+
+                  <p className="text-sm text-gray-400 mt-1 mb-4">
+                    Create a resume before applying to opportunities.
+                  </p>
+
+                  <Link
+                    href="/resume"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+                  >
+                    Create Resume
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              )}
+            </section>
+
+            {/* Security */}
+            <section className="mt-8 border-t border-gray-100 pt-7">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50">
+                  <Lock className="w-5 h-5 text-red-600" />
+                </div>
+
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                    Security
+                  </h2>
+
+                  <p className="text-sm text-gray-500">
+                    Manage your account security.
+                  </p>
+                </div>
               </div>
 
-              {/* Resume */}
-              <div className="mt-8 border-t pt-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Resume</h2>
-
-                {loading ? (
-                  <p className="text-gray-500">Checking resume...</p>
-                ) : resume ? (
-                  <div className="flex gap-4 justify-center">
-                    <Link
-                      href="/resume/view"
-                      className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                    >
-                      View Resume
-                    </Link>
-                    <Link
-                      href="/resume/edit"
-                      className="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
-                    >
-                      Edit Resume
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <p className="text-gray-500 mb-4">No resume Created yet.</p>
-                    <Link
-                      href="/resume"
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      Create Resume
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              {/* Security */}
-              <div className="mt-10 border-t pt-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Security
-                </h2>
-                <div className="space-y-5">
-                  {/* LOGIN HISTORY */}
-                  <div className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-blue-100 p-4 rounded-xl">
-                        <History className="h-7 w-7 text-blue-600" />
+              <div className="space-y-3">
+                {/* Login History */}
+                <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5 shadow-sm hover:shadow-md transition">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <div className="shrink-0 flex h-11 w-11 items-center justify-center rounded-lg bg-blue-50">
+                        <History className="h-5 w-5 text-blue-600" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">
+
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-gray-900">
                           Login History
                         </h3>
-                        <p className="text-gray-500 text-sm mt-1">
-                          View every login including browser, operating system,
-                          device, IP address and login time.
+
+                        <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+                          View browser, operating system, device, IP address
+                          and login time.
                         </p>
                       </div>
                     </div>
+
                     <Link
                       href="/login-history"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition"
+                      className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition"
                     >
                       View
+                      <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
+                </div>
 
-                  {/* FORGOT PASSWORD */}
-                  <div className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-red-100 p-4 rounded-xl">
-                        <History className="h-7 w-7 text-red-600" />
+                {/* Change Password */}
+                <div className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5 shadow-sm hover:shadow-md transition">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <div className="shrink-0 flex h-11 w-11 items-center justify-center rounded-lg bg-red-50">
+                        <Lock className="h-5 w-5 text-red-600" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">
+
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-gray-900">
                           Change Password
                         </h3>
-                        <p className="text-gray-500 text-sm mt-1">
+
+                        <p className="text-sm text-gray-500 mt-1 leading-relaxed">
                           Update your password to keep your account secure.
                         </p>
                       </div>
                     </div>
+
                     <Link
                       href="/change-password"
-                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-medium transition"
+                      className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-medium transition"
                     >
                       Change
+                      <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
-export default index;
+export default Index;

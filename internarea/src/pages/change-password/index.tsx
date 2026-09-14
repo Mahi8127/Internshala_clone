@@ -1,114 +1,225 @@
+"use client";
+
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
-import { ArrowLeft, Lock } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Lock,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 
-const index = () => {
+const ChangePassword = () => {
   const user = useSelector(selectuser);
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleChangePassword = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     if (!currentPassword || !newPassword || !confirmPassword) {
       return toast.error("Please fill all fields");
     }
+
     if (newPassword !== confirmPassword) {
-      return toast.error("Password do no match");
+      return toast.error("Passwords do not match");
     }
+
     if (newPassword.length < 6) {
       return toast.error("Password must be at least 6 characters");
     }
+
+    if (currentPassword === newPassword) {
+      return toast.error(
+        "New password must be different from current password"
+      );
+    }
+
     try {
       setLoading(true);
+
       const response = await axios.put(
         "http://localhost:5000/api/change-password",
         {
           userId: user.id,
           currentPassword,
           newPassword,
-        },
+        }
       );
+
       toast.success(response.data.message);
+
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Something went Wrong");
+      toast.error(
+        error.response?.data?.message || "Something went wrong"
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  const PasswordInput = ({
+    label,
+    placeholder,
+    value,
+    onChange,
+    show,
+    setShow,
+  }: {
+    label: string;
+    placeholder: string;
+    value: string;
+    onChange: (value: string) => void;
+    show: boolean;
+    setShow: (value: boolean) => void;
+  }) => {
+    return (
+      <div>
+        <label className="block mb-2 text-sm font-semibold text-gray-800">
+          {label}
+        </label>
+
+        <div className="relative">
+          <Lock
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
+
+          <input
+            type={show ? "text" : "password"}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            disabled={loading}
+            className="w-full h-12 rounded-xl border border-gray-200 bg-white pl-10 pr-12 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-black focus:ring-2 focus:ring-black/10 disabled:bg-gray-50"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShow(!show)}
+            disabled={loading}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition"
+            aria-label={show ? "Hide password" : "Show password"}
+          >
+            {show ? <EyeOff size={19} /> : <Eye size={19} />}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 py-10">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-[calc(100vh-80px)] bg-gray-50 px-4 py-8 sm:py-12">
+      <div className="w-full max-w-2xl mx-auto">
+        {/* Back */}
         <Link
           href="/profile"
-          className="inline-flex items-center text-blue-600 mb-6"
+          className="inline-flex items-center gap-2 mb-6 text-sm font-medium text-gray-600 hover:text-black transition"
         >
-          <ArrowLeft className="mr-2 h-5 w-5" />
+          <ArrowLeft size={18} />
           Back to Profile
         </Link>
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="flex items-center mb-8">
-            <div className="bg-red-100 p-3 rounded-full">
-              <Lock className="text-red-600 h-7 w-7" />
-            </div>
 
-            <div className="ml-4">
-              <h1 className="text-3xl font-bold text-gray-900">Change Password</h1>
-              <p className="text-gray-500">
-                Update your account password securely
-              </p>
+        {/* Card */}
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="p-6 sm:p-8 border-b border-gray-100">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-red-50">
+                <Lock className="h-6 w-6 sm:h-7 sm:w-7 text-red-600" />
+              </div>
+
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  Change Password
+                </h1>
+
+                <p className="mt-1 text-sm sm:text-base text-gray-500">
+                  Update your account password securely.
+                </p>
+              </div>
             </div>
           </div>
-          <form onSubmit={handleChangePassword} className="space-y-5">
-            <div>
-              <label className="block mb-2 font-medium text-gray-900">Current Password</label>
-              <input
-                type="password"
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                value={currentPassword}
-                className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-500 text-gray-800"
-                placeholder="Enter current password"
-              />
+
+          {/* Form */}
+          <form
+            onSubmit={handleChangePassword}
+            className="p-6 sm:p-8 space-y-5"
+          >
+            <PasswordInput
+              label="Current Password"
+              placeholder="Enter current password"
+              value={currentPassword}
+              onChange={setCurrentPassword}
+              show={showCurrent}
+              setShow={setShowCurrent}
+            />
+
+            <PasswordInput
+              label="New Password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={setNewPassword}
+              show={showNew}
+              setShow={setShowNew}
+            />
+
+            <PasswordInput
+              label="Confirm New Password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              show={showConfirm}
+              setShow={setShowConfirm}
+            />
+
+            {/* Password requirements */}
+            <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck size={18} className="text-gray-700" />
+
+                <p className="text-sm font-semibold text-gray-800">
+                  Password requirements
+                </p>
+              </div>
+
+              <ul className="text-xs sm:text-sm text-gray-500 space-y-1">
+                <li>• At least 6 characters</li>
+                <li>• New and confirm passwords must match</li>
+                <li>• New password should be different from the current password</li>
+              </ul>
             </div>
 
-            <div>
-              <label className="block mb-2 font-medium text-gray-900">New Password</label>
-              <input
-                type="password"
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-500 text-gray-800"
-                placeholder="Enter New password"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 font-medium text-gray-900">Confirm Password</label>
-              <input
-                type="password"
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                value={confirmPassword}
-                className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-500 text-gray-800"
-                placeholder="Confirm New password"
-              />
-            </div>
-
-            <button type="submit" disabled={loading} className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50">
-                {loading ? "Updating...":"Update Password"}
+            {/* Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 rounded-xl bg-red-600 hover:bg-red-700 active:scale-[0.99] text-white font-semibold text-sm sm:text-base transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Updating..." : "Update Password"}
             </button>
           </form>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
-export default index;
+export default ChangePassword;
