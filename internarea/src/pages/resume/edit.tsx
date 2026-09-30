@@ -177,7 +177,7 @@ const Resume = () => {
         setLoading(true);
 
         const res = await axios.get(
-          `http://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
         );
 
         const resume = res.data.resume;
@@ -466,7 +466,7 @@ const Resume = () => {
       }
 
       const response = await axios.put(
-        `http://internshala-backend-5ycp.onrender.com/api/resume/${resumeId}`,
+        `https://internshala-backend-5ycp.onrender.com/api/resume/${resumeId}`,
         data,
         {
           headers: {
@@ -492,7 +492,7 @@ const Resume = () => {
   const existingPhoto = useMemo(() => {
     if (!formData.photo) return "";
 
-    return `http://internshala-backend-5ycp.onrender.com/uploads/profilePhoto/${formData.photo}`;
+    return `https://internshala-backend-5ycp.onrender.com/uploads/profilePhoto/${formData.photo}`;
   }, [formData.photo]);
 
   // --------------------------------------------------

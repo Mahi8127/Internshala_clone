@@ -88,7 +88,7 @@ const SubscriptionPage = () => {
 
     try {
       const response = await axios.get(
-        `http://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
+        `https://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
       );
 
       if (response.data.success) {
@@ -182,7 +182,7 @@ const SubscriptionPage = () => {
          --------------------------------------------- */
 
       const orderResponse = await axios.post(
-        "http://internshala-backend-5ycp.onrender.com/api/payment/subscription/create-order",
+        "https://internshala-backend-5ycp.onrender.com/api/payment/subscription/create-order",
         {
           userId: user.id,
           plan: planId,
@@ -246,7 +246,7 @@ const SubscriptionPage = () => {
                ----------------------------------------- */
 
             const verifyResponse = await axios.post(
-              "http://internshala-backend-5ycp.onrender.com/api/payment/subscription/verify-payment",
+              "https://internshala-backend-5ycp.onrender.com/api/payment/subscription/verify-payment",
               {
                 razorpay_order_id:
                   response.razorpay_order_id,

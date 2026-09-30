@@ -24,7 +24,7 @@ export default function ForgotPassword() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://internshala-backend-5ycp.onrender.com/api/forgot-password",
+        "https://internshala-backend-5ycp.onrender.com/api/forgot-password",
         {
           identifier: identifier.trim(),
         }

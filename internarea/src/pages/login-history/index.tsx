@@ -30,7 +30,7 @@ const Index = () => {
 
       try {
         const response = await axios.get(
-          `http://internshala-backend-5ycp.onrender.com/api/login-history/${user.id}`
+          `https://internshala-backend-5ycp.onrender.com/api/login-history/${user.id}`
         );
 
         setHistory(response.data.history || []);

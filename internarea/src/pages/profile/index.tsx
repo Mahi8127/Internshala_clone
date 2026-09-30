@@ -30,7 +30,7 @@ const Index = () => {
 
       try {
         const response = await axios.get(
-          `http://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
         );
 
         setResume(response.data.resume);

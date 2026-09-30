@@ -40,7 +40,7 @@ const Index = () => {
       setLoading(true);
 
       const response = await axios.post(
-        "http://internshala-backend-5ycp.onrender.com/api/login",
+        "https://internshala-backend-5ycp.onrender.com/api/login",
         {
           identifier,
           password,
@@ -86,7 +86,7 @@ const Index = () => {
   const handleResendOtp = async () => {
     try {
       const response = await axios.post(
-        "http://internshala-backend-5ycp.onrender.com/api/resend-login-otp",
+        "https://internshala-backend-5ycp.onrender.com/api/resend-login-otp",
         {
           email,
         }
@@ -118,7 +118,7 @@ const Index = () => {
       };
 
       const response = await axios.post(
-        "http://internshala-backend-5ycp.onrender.com/api/google-login",
+        "https://internshala-backend-5ycp.onrender.com/api/google-login",
         googleUser
       );
 
@@ -197,7 +197,7 @@ const Index = () => {
 
     try {
       const response = await axios.post(
-        "http://internshala-backend-5ycp.onrender.com/api/verify-login-otp",
+        "https://internshala-backend-5ycp.onrender.com/api/verify-login-otp",
         {
           email,
           otp: otp.join(""),

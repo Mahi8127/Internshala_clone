@@ -16,7 +16,7 @@ export default function ResumePreview() {
 
     const fetchResume = async () => {
       try {
-        const res = await axios.get(`http://internshala-backend-5ycp.onrender.com/api/resume/${id}`);
+        const res = await axios.get(`https://internshala-backend-5ycp.onrender.com/api/resume/${id}`);
 
         setResume(res.data.resume);
       } catch (error) {

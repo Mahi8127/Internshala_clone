@@ -29,7 +29,7 @@ import PostCard from "../../Components/PublicSpace/PostCard";
 import ShareModal from "../../Components/PublicSpace/ShareModal";
 
 const API_URL =
-  "http://internshala-backend-5ycp.onrender.com/";
+  "https://internshala-backend-5ycp.onrender.com/";
 
 const PublicSpace = () => {
   const { t } = useLanguage();

@@ -22,7 +22,7 @@
 // import MessageBubble from "./MessageBubble";
 // import MessageNotification from "./MessageNotification";
 
-// const API_URL = "http://internshala-backend-5ycp.onrender.com/";
+// const API_URL = "https://internshala-backend-5ycp.onrender.com/";
 
 // interface ChatProps {
 //   currentUserId: string;
@@ -1425,7 +1425,7 @@
 // import { ArrowLeft, MoreVertical, Send, MessageCircle } from "lucide-react";
 // import MessageBubble from "./MessageBubble";
 
-// const API_URL = "http://internshala-backend-5ycp.onrender.com/";
+// const API_URL = "https://internshala-backend-5ycp.onrender.com/";
 
 // interface User {
 //   _id: string;
@@ -1834,7 +1834,7 @@
 // import React, { useEffect, useState } from "react";
 // import { Search, MessageCircle } from "lucide-react";
 
-// const API_URL = "http://internshala-backend-5ycp.onrender.com/";
+// const API_URL = "https://internshala-backend-5ycp.onrender.com/";
 
 // interface User {
 //   _id: string;

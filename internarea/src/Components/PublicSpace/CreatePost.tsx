@@ -76,7 +76,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
       formData.append("media", selectedFile);
 
       const response = await fetch(
-        "http://internshala-backend-5ycp.onrender.com/api/posts/create",
+        "https://internshala-backend-5ycp.onrender.com/api/posts/create",
         {
           method: "POST",
           body: formData,
