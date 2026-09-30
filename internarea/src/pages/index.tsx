@@ -71,8 +71,8 @@ export default function SvgSlider() {
     const fetchdata = async () => {
       try {
         const [internshipres, jobres] = await Promise.all([
-          axios.get("http://internshala-backend-5ycp.onrender.com//api/internship"),
-          axios.get("http://internshala-backend-5ycp.onrender.com//api/job"),
+          axios.get("http://internshala-backend-5ycp.onrender.com/api/internship"),
+          axios.get("http://internshala-backend-5ycp.onrender.com/api/job"),
         ]);
 
         setinternship(internshipres.data);

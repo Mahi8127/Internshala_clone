@@ -62,7 +62,7 @@ const index = () => {
       setisloading(true);
 
       await axios.post(
-        "http://internshala-backend-5ycp.onrender.com//api/internship",
+        "http://internshala-backend-5ycp.onrender.com/api/internship",
         formData
       );
 

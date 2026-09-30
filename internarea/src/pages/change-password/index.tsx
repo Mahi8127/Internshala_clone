@@ -53,7 +53,7 @@ const ChangePassword = () => {
       setLoading(true);
 
       const response = await axios.put(
-        "http://internshala-backend-5ycp.onrender.com//api/change-password",
+        "http://internshala-backend-5ycp.onrender.com/api/change-password",
         {
           userId: user.id,
           currentPassword,

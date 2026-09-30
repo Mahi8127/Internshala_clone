@@ -38,7 +38,7 @@ const Index = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "http://internshala-backend-5ycp.onrender.com//api/job"
+          "http://internshala-backend-5ycp.onrender.com/api/job"
         );
 
         setJobData(res.data);
