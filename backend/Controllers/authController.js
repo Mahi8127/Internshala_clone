@@ -86,6 +86,8 @@ const loginUser = async (req, res) => {
     } else if (result.device.type === "tablet") {
       deviceType = "Tablet";
     }
+    console.log("FINAL DEVICE TYPE:", deviceType);
+console.log("CURRENT HOUR:", new Date().getHours());
 
     if (deviceType === "Mobile") {
       const now = new Date();
