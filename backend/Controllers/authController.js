@@ -11,19 +11,24 @@ const generatePassword = require("../Utils/passwordGenerator.js");
 const registerUser = async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
+
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       return res.status(400).json({
         message: "User already exists",
       });
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = new User({
       name,
       email,
       phone,
       password: hashedPassword,
     });
+
     await user.save();
 
     return res.status(201).json({
@@ -31,6 +36,7 @@ const registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server Error",
     });
@@ -50,6 +56,7 @@ const loginUser = async (req, res) => {
         message: "User not found",
       });
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -62,6 +69,10 @@ const loginUser = async (req, res) => {
     parser.setUA(req.headers["user-agent"]);
     const result = parser.getResult();
 
+    // DEBUG: Check what device the backend detects
+    console.log("USER AGENT:", req.headers["user-agent"]);
+    console.log("DEVICE DETECTED:", result.device);
+
     const browser = result.browser.name || "Unknown";
     const browserVersion = result.browser.version || "Unknown";
 
@@ -69,6 +80,7 @@ const loginUser = async (req, res) => {
     const osVersion = result.os.version || "Unknown";
 
     let deviceType = "Desktop";
+
     if (result.device.type === "mobile") {
       deviceType = "Mobile";
     } else if (result.device.type === "tablet") {
@@ -125,6 +137,7 @@ const loginUser = async (req, res) => {
         email: user.email,
       });
     }
+
     const token = jwt.sign(
       {
         id: user._id,
@@ -135,6 +148,7 @@ const loginUser = async (req, res) => {
         expiresIn: "7d",
       },
     );
+
     await LoginHistory.create({
       user: user._id,
       browser,
@@ -168,14 +182,18 @@ const loginUser = async (req, res) => {
 const verifyLoginOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
+
     const otpData = loginOtpStore[email];
+
     if (!otpData) {
       return res.status(400).json({
         message: "OTP not found, Please login again",
       });
     }
+
     if (Date.now() > otpData.expires) {
       delete loginOtpStore[email];
+
       return res.status(400).json({
         message: "OTP has expired",
       });
@@ -188,6 +206,7 @@ const verifyLoginOtp = async (req, res) => {
     }
 
     const user = otpData.user;
+
     const token = jwt.sign(
       {
         id: user._id,
@@ -224,6 +243,7 @@ const verifyLoginOtp = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+
     return res.status(500).json({
       message: "Server Error",
     });
@@ -252,6 +272,7 @@ const getLoginHistory = async (req, res) => {
 const googleLogin = async (req, res) => {
   try {
     const { name, email, photo } = req.body;
+
     let user = await User.findOne({ email });
 
     if (!user) {
@@ -261,6 +282,7 @@ const googleLogin = async (req, res) => {
         photo,
       });
     }
+
     res.status(200).json({
       success: true,
       token,
@@ -282,6 +304,7 @@ const googleLogin = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { identifier } = req.body;
+
     const user = await User.findOne({
       $or: [{ email: identifier }, { phone: identifier }],
     });
@@ -309,6 +332,7 @@ const forgotPassword = async (req, res) => {
 
     const newPassword = generatePassword(10);
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+
     user.password = hashedPassword;
     user.lastPasswordReset = new Date();
 
@@ -326,11 +350,13 @@ const forgotPassword = async (req, res) => {
       Regards,
       Internship Portal Team`,
     );
+
     return res.status(200).json({
       message: "A new password has been sent to your registered email.",
     });
   } catch (error) {
     console.log(error);
+
     res.status(500).json({
       message: "Server error",
     });
@@ -350,6 +376,7 @@ const changePassword = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
+
     if (!isMatch) {
       return res.status(400).json({
         message: "Current password is incorrect",
@@ -357,7 +384,9 @@ const changePassword = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+
     user.password = hashedPassword;
+
     await user.save();
 
     return res.status(200).json({
@@ -365,6 +394,7 @@ const changePassword = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+
     return res.status(500).json({
       message: "Server Error",
     });
@@ -374,6 +404,7 @@ const changePassword = async (req, res) => {
 const resendLoginOtp = async (req, res) => {
   try {
     const { email } = req.body;
+
     const otpData = loginOtpStore[email];
 
     if (!otpData) {
@@ -429,6 +460,7 @@ const getAllUsers = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   registerUser,
   loginUser,
