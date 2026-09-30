@@ -12,8 +12,10 @@ import {
 import Link from "next/link";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -51,7 +53,7 @@ const Index = () => {
       !formData.password ||
       !formData.confirmpassword
     ) {
-      toast.error("Please fill all fields");
+      toast.error(t("auth.register.fillAllFields"));
       return;
     }
 
@@ -59,7 +61,7 @@ const Index = () => {
       formData.password !==
       formData.confirmpassword
     ) {
-      toast.error("Passwords do not match");
+      toast.error(t("auth.register.passwordsMismatch"));
       return;
     }
 
@@ -89,10 +91,10 @@ const Index = () => {
       if (axios.isAxiosError(error)) {
         toast.error(
           error.response?.data?.message ||
-            "Something went wrong"
+            t("auth.register.somethingWrong")
         );
       } else {
-        toast.error("Something went wrong");
+        toast.error(t("auth.register.somethingWrong"));
       }
     } finally {
       setLoading(false);
@@ -124,11 +126,11 @@ const Index = () => {
               </div>
 
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                Create Your Account
+                {t("auth.register.title")}
               </h1>
 
               <p className="mt-2 text-sm text-slate-500">
-                Register to get started
+                {t("auth.register.subtitle")}
               </p>
 
             </div>
@@ -145,7 +147,7 @@ const Index = () => {
               <div>
 
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Full Name
+                  {t("auth.register.fullNameLabel")}
                 </label>
 
                 <div className="relative">
@@ -162,7 +164,7 @@ const Index = () => {
                   <input
                     type="text"
                     name="name"
-                    placeholder="Enter your full name"
+                    placeholder={t("auth.register.fullNamePlaceholder")}
                     value={formData.name}
                     onChange={handleChange}
                     autoComplete="name"
@@ -191,7 +193,7 @@ const Index = () => {
               <div>
 
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Email
+                  {t("auth.register.emailLabel")}
                 </label>
 
                 <div className="relative">
@@ -208,7 +210,7 @@ const Index = () => {
                   <input
                     type="email"
                     name="email"
-                    placeholder="Enter your email"
+                    placeholder={t("auth.register.emailPlaceholder")}
                     value={formData.email}
                     onChange={handleChange}
                     autoComplete="email"
@@ -237,7 +239,7 @@ const Index = () => {
               <div>
 
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Phone Number
+                  {t("auth.register.phoneLabel")}
                 </label>
 
                 <div className="relative">
@@ -254,7 +256,7 @@ const Index = () => {
                   <input
                     type="tel"
                     name="phone"
-                    placeholder="Enter your phone number"
+                    placeholder={t("auth.register.phonePlaceholder")}
                     value={formData.phone}
                     onChange={handleChange}
                     autoComplete="tel"
@@ -284,7 +286,7 @@ const Index = () => {
               <div>
 
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Password
+                  {t("auth.register.passwordLabel")}
                 </label>
 
                 <div className="relative">
@@ -305,7 +307,7 @@ const Index = () => {
                         : "password"
                     }
                     name="password"
-                    placeholder="Create a password"
+                    placeholder={t("auth.register.passwordPlaceholder")}
                     value={formData.password}
                     onChange={handleChange}
                     autoComplete="new-password"
@@ -332,8 +334,8 @@ const Index = () => {
                     }
                     aria-label={
                       showPassword
-                        ? "Hide password"
-                        : "Show password"
+                        ? t("auth.register.hidePassword")
+                        : t("auth.register.showPassword")
                     }
                     className="
                       absolute right-3.5 top-1/2
@@ -359,7 +361,7 @@ const Index = () => {
               <div>
 
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Confirm Password
+                  {t("auth.register.confirmPasswordLabel")}
                 </label>
 
                 <div className="relative">
@@ -380,7 +382,7 @@ const Index = () => {
                         : "password"
                     }
                     name="confirmpassword"
-                    placeholder="Confirm your password"
+                    placeholder={t("auth.register.confirmPasswordPlaceholder")}
                     value={formData.confirmpassword}
                     onChange={handleChange}
                     autoComplete="new-password"
@@ -409,8 +411,8 @@ const Index = () => {
                     }
                     aria-label={
                       showConfirmPassword
-                        ? "Hide password"
-                        : "Show password"
+                        ? t("auth.register.hidePassword")
+                        : t("auth.register.showPassword")
                     }
                     className="
                       absolute right-3.5 top-1/2
@@ -453,8 +455,8 @@ const Index = () => {
                 "
               >
                 {loading
-                  ? "Creating account..."
-                  : "Create Account"}
+                  ? t("auth.register.submitting")
+                  : t("auth.register.submit")}
 
                 {!loading && (
                   <ArrowRight size={17} />
@@ -469,7 +471,7 @@ const Index = () => {
 
               <p className="text-sm text-slate-500">
 
-                Already have an account?{" "}
+                {t("auth.register.haveAccount")}{" "}
 
                 <Link
                   href="/login"
@@ -481,7 +483,7 @@ const Index = () => {
                     hover:underline
                   "
                 >
-                  Login
+                  {t("auth.register.loginLink")}
                 </Link>
 
               </p>

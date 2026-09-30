@@ -8,8 +8,10 @@ import React, { useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "@/firebase/firebase";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -30,7 +32,7 @@ const Index = () => {
     e.preventDefault();
 
     if (!identifier || !password) {
-      toast.error("Please fill all fields");
+      toast.error(t("auth.login.fillAllFields"));
       return;
     }
 
@@ -60,7 +62,7 @@ const Index = () => {
 
       dispatch(login(response.data.user));
 
-      toast.success("Login Successfully");
+      toast.success(t("auth.login.loginSuccess"));
 
       setIdentifier("");
       setPassword("");
@@ -69,10 +71,10 @@ const Index = () => {
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         toast.error(
-          error.response?.data?.message || "Login Failed"
+          error.response?.data?.message || t("auth.login.loginFailed")
         );
       } else {
-        toast.error("Something went wrong");
+        toast.error(t("auth.login.somethingWrong"));
       }
     } finally {
       setLoading(false);
@@ -98,7 +100,7 @@ const Index = () => {
     } catch (error: any) {
       toast.error(
         error.response?.data?.message ||
-          "Failed to resend OTP"
+          t("auth.login.otpRequired.resendFailed")
       );
     }
   };
@@ -127,12 +129,12 @@ const Index = () => {
 
       dispatch(login(response.data.user));
 
-      toast.success("Logged in successfully");
+      toast.success(t("auth.login.loginSuccess"));
 
       router.push("/");
     } catch (error) {
       console.error(error);
-      toast.error("Login failed");
+      toast.error(t("auth.login.loginFailed"));
     }
   };
 
@@ -189,7 +191,7 @@ const Index = () => {
     e.preventDefault();
 
     if (otp.join("").length !== 6) {
-      toast.error("Please enter the complete OTP");
+      toast.error(t("auth.login.otpRequired.incompleteOtp"));
       return;
     }
 
@@ -220,7 +222,7 @@ const Index = () => {
     } catch (error: any) {
       toast.error(
         error.response?.data?.message ||
-          "OTP verification failed"
+          t("auth.login.otpRequired.otpFailed")
       );
     }
   };
@@ -252,11 +254,11 @@ const Index = () => {
                   </div>
 
                   <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                    Welcome Back
+                    {t("auth.login.title")}
                   </h1>
 
                   <p className="mt-2 text-sm text-slate-500">
-                    Login to continue to your account
+                    {t("auth.login.subtitle")}
                   </p>
 
                 </div>
@@ -273,7 +275,7 @@ const Index = () => {
                   <div>
 
                     <label className="mb-2 block text-sm font-semibold text-slate-700">
-                      Email or Phone Number
+                      {t("auth.login.identifierLabel")}
                     </label>
 
                     <div className="relative">
@@ -289,7 +291,7 @@ const Index = () => {
 
                       <input
                         type="text"
-                        placeholder="Enter email or phone"
+                        placeholder={t("auth.login.identifierPlaceholder")}
                         value={identifier}
                         onChange={(e) =>
                           setIdentifier(e.target.value)
@@ -319,7 +321,7 @@ const Index = () => {
                   <div>
 
                     <label className="mb-2 block text-sm font-semibold text-slate-700">
-                      Password
+                      {t("auth.login.passwordLabel")}
                     </label>
 
                     <div className="relative">
@@ -339,7 +341,7 @@ const Index = () => {
                             ? "text"
                             : "password"
                         }
-                        placeholder="Enter password"
+                        placeholder={t("auth.login.passwordPlaceholder")}
                         value={password}
                         onChange={(e) =>
                           setPassword(e.target.value)
@@ -367,8 +369,8 @@ const Index = () => {
                         }
                         aria-label={
                           showPassword
-                            ? "Hide password"
-                            : "Show password"
+                            ? t("auth.login.hidePassword")
+                            : t("auth.login.showPassword")
                         }
                         className="
                           absolute right-3.5 top-1/2
@@ -402,7 +404,7 @@ const Index = () => {
                         hover:underline
                       "
                     >
-                      Forgot Password?
+                      {t("auth.login.forgotPassword")}
                     </Link>
 
                   </div>
@@ -428,8 +430,8 @@ const Index = () => {
                     "
                   >
                     {loading
-                      ? "Logging in..."
-                      : "Login"}
+                      ? t("auth.login.submitting")
+                      : t("auth.login.submit")}
 
                     {!loading && (
                       <ArrowRight size={17} />
@@ -445,7 +447,7 @@ const Index = () => {
                   <div className="h-px flex-1 bg-gray-200" />
 
                   <span className="text-xs font-semibold text-slate-400">
-                    OR
+                    {t("auth.login.or")}
                   </span>
 
                   <div className="h-px flex-1 bg-gray-200" />
@@ -496,7 +498,7 @@ const Index = () => {
                     />
                   </svg>
 
-                  Continue with Google
+                  {t("auth.login.continueWithGoogle")}
 
                 </button>
 
@@ -506,7 +508,7 @@ const Index = () => {
 
                   <p className="text-sm text-slate-500">
 
-                    Don't have an account?{" "}
+                    {t("auth.login.noAccount")}{" "}
 
                     <Link
                       href="/register"
@@ -517,7 +519,7 @@ const Index = () => {
                         hover:underline
                       "
                     >
-                      Register
+                      {t("auth.login.registerLink")}
                     </Link>
 
                   </p>
@@ -538,11 +540,11 @@ const Index = () => {
                   </div>
 
                   <h2 className="mt-5 text-2xl font-bold text-slate-900 sm:text-3xl">
-                    Verify Your Email
+                    {t("auth.login.otpRequired.title")}
                   </h2>
 
                   <p className="mt-2 text-sm leading-6 text-slate-500">
-                    We've sent a verification code to
+                    {t("auth.login.otpRequired.description")}
                   </p>
 
                   <p className="mt-1 break-all text-sm font-bold text-blue-600">
@@ -561,7 +563,7 @@ const Index = () => {
                   <div>
 
                     <label className="mb-4 block text-center text-sm font-semibold text-slate-700">
-                      Enter 6-digit OTP
+                      {t("auth.login.otpRequired.otpLabel")}
                     </label>
 
                     {/* Responsive OTP boxes */}
@@ -628,7 +630,7 @@ const Index = () => {
                       hover:shadow-md
                     "
                   >
-                    Verify OTP
+                    {t("auth.login.otpRequired.verifyBtn")}
                     <ArrowRight size={17} />
                   </button>
 
@@ -648,7 +650,7 @@ const Index = () => {
                       hover:bg-slate-50
                     "
                   >
-                    Resend OTP
+                    {t("auth.login.otpRequired.resendBtn")}
                   </button>
 
                   {/* Back */}
@@ -667,7 +669,7 @@ const Index = () => {
                       hover:text-blue-600
                     "
                   >
-                    ← Back to Login
+                    {t("auth.login.otpRequired.backBtn")}
                   </button>
 
                 </form>

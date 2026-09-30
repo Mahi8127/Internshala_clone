@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import toast from "react-hot-toast";
+import { useLanguage } from "@/context/LanguageContext";
 
 const API_URL =
   "http://localhost:5000";
@@ -39,6 +40,7 @@ const ShareModal = ({
   onClose,
   onShared,
 }: ShareModalProps) => {
+  const { t } = useLanguage();
   const [search, setSearch] =
     useState("");
 
@@ -132,7 +134,7 @@ const ShareModal = ({
   ) => {
     if (!postId) {
       toast.error(
-        "Post ID is missing.",
+        t("publicSpace.shareModal.postIdMissing"),
       );
 
       return;
@@ -140,7 +142,7 @@ const ShareModal = ({
 
     if (!currentUserId) {
       toast.error(
-        "Please login first.",
+        t("publicSpace.loginFirst"),
       );
 
       return;
@@ -197,12 +199,12 @@ const ShareModal = ({
       ) {
         throw new Error(
           data.message ||
-            "Failed to share post.",
+            t("publicSpace.shareModal.failedShare"),
         );
       }
 
       toast.success(
-        "Post shared successfully.",
+        t("publicSpace.shareModal.postShared"),
       );
 
       onShared?.();
@@ -216,7 +218,7 @@ const ShareModal = ({
 
       toast.error(
         error?.message ||
-          "Failed to share post.",
+          t("publicSpace.shareModal.failedShare"),
       );
     } finally {
       setSendingUserId(null);
@@ -271,11 +273,11 @@ const ShareModal = ({
         >
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Share Post
+              {t("publicSpace.shareModal.title")}
             </h2>
 
             <p className="text-xs text-gray-500 mt-1">
-              Select someone to send this post to.
+              {t("publicSpace.shareModal.subtitle")}
             </p>
           </div>
 
@@ -318,7 +320,7 @@ const ShareModal = ({
                   e.target.value,
                 )
               }
-              placeholder="Search user..."
+              placeholder={t("publicSpace.shareModal.searchPlaceholder")}
               autoFocus
               className="
                 w-full
@@ -348,24 +350,24 @@ const ShareModal = ({
           {!search.trim() ? (
             <div className="px-6 py-10 text-center">
               <p className="text-sm text-gray-500">
-                Search for a user to share this post.
+                {t("publicSpace.shareModal.searchPrompt")}
               </p>
             </div>
           ) : loading ? (
             <div className="px-6 py-10 text-center">
               <p className="text-sm text-gray-500">
-                Searching...
+                {t("publicSpace.shareModal.searching")}
               </p>
             </div>
           ) : users.length ===
             0 ? (
             <div className="px-6 py-10 text-center">
               <p className="text-sm font-medium text-gray-700">
-                No users found
+                {t("publicSpace.shareModal.noUsers")}
               </p>
 
               <p className="text-xs text-gray-400 mt-1">
-                Try another name or email.
+                {t("publicSpace.shareModal.tryAnother")}
               </p>
             </div>
           ) : (

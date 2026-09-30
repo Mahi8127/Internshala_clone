@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   FaFacebook,
   FaTwitter,
@@ -5,6 +7,7 @@ import {
 } from "react-icons/fa";
 
 export default function Footer() {
+  const {t} = useLanguage()
   return (
     <footer className="bg-slate-900 text-white mt-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -16,54 +19,54 @@ export default function Footer() {
 
             {/* Internship by places */}
             <FooterSection
-              title="Internship by Places"
+              title={t("fotter.place")}
               items={[
-                "New York",
-                "Los Angeles",
-                "Chicago",
-                "San Francisco",
-                "Miami",
-                "Seattle",
+                t("fotter.place1"),
+                t("fotter.place2"),
+                t("fotter.place3"),
+                t("fotter.place4"),
+                t("fotter.place5"),
+                t("fotter.place6"),
               ]}
             />
 
-            {/* Internship by stream */}
+            {/* Company */}
             <FooterSection
-              title="Internship by Stream"
+              title={t("fotter.company")}
               items={[
-                "About us",
-                "Careers",
-                "Press",
-                "News",
-                "Media kit",
-                "Contact",
+                t("fotter.company1"),
+                t("fotter.company2"),
+                t("fotter.company3"),
+                t("fotter.company4"),
+                t("fotter.company5"),
+                t("fotter.company6"),
               ]}
             />
 
-            {/* Job Places */}
+            {/* Resources */}
             <FooterSection
-              title="Job Places"
+              title={t("fotter.resources")}
               items={[
-                "Blog",
-                "Newsletter",
-                "Events",
-                "Help center",
-                "Tutorials",
-                "Support",
+                t("fotter.resources1"),
+                t("fotter.resources2"),
+                t("fotter.resources3"),
+                t("fotter.resources4"),
+                t("fotter.resources5"),
+                t("fotter.resources6"),
               ]}
               links
             />
 
-            {/* Jobs by streams */}
+            {/* Jobs by Industry */}
             <FooterSection
-              title="Jobs by Streams"
+              title={t("fotter.industry")}
               items={[
-                "Startups",
-                "Enterprise",
-                "Government",
-                "SaaS",
-                "Marketplaces",
-                "Ecommerce",
+                t("fotter.industry1"),
+                t("fotter.industry2"),
+                t("fotter.industry3"),
+                t("fotter.industry4"),
+                t("fotter.industry5"),
+                t("fotter.industry6"),
               ]}
               links
             />
@@ -77,36 +80,36 @@ export default function Footer() {
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
 
             <FooterSection
-              title="About Us"
+              title={t("fotter.company1")}
               items={[
-                "Startups",
-                "Enterprise",
+                t("fotter.industry1"),
+                t("fotter.industry2"),
               ]}
               links
             />
 
             <FooterSection
-              title="Team Diary"
+              title={t("fotter.teamdiary")}
               items={[
-                "Startups",
-                "Enterprise",
+                t("fotter.industry1"),
+                t("fotter.industry2"),
               ]}
               links
             />
 
             <FooterSection
-              title="Terms & Conditions"
+              title={t("fotter.terms")}
               items={[
-                "Startups",
-                "Enterprise",
+                t("fotter.industry1"),
+                t("fotter.industry2"),
               ]}
               links
             />
 
             <FooterSection
-              title="Sitemap"
+              title={t("fotter.sitemap")}
               items={[
-                "Startups",
+                t("fotter.industry1"),
               ]}
               links
             />
@@ -125,7 +128,7 @@ export default function Footer() {
               className="w-full sm:w-auto flex items-center justify-center gap-3 border border-slate-500 px-5 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800 hover:border-slate-400 transition-all duration-200"
             >
               <span className="text-lg">▶</span>
-              <span>Get Android App</span>
+              <span>{t("fotter.androidApp")}</span>
             </button>
 
             {/* Social Media */}
@@ -159,7 +162,7 @@ export default function Footer() {
 
             {/* Copyright */}
             <p className="text-sm text-slate-400 text-center lg:text-right">
-              © Copyright 2025. All Rights Reserved.
+              {t("fotter.copyright")}
             </p>
 
           </div>
@@ -194,13 +197,13 @@ function FooterSection({
 
         {items.map((item, index) =>
           links ? (
-            <a
+            <Link
               key={index}
               href="/"
               className="text-sm text-slate-400 hover:text-blue-400 transition-colors duration-200"
             >
               {item}
-            </a>
+            </Link>
           ) : (
             <p
               key={index}

@@ -1,3 +1,4 @@
+import { useLanguage } from "@/context/LanguageContext";
 import {
   BarChart3,
   Briefcase,
@@ -12,42 +13,42 @@ import Link from "next/link";
 import React from "react";
 
 const AdminPanel = () => {
+  const {t} = useLanguage()
   const stats = [
     {
-      label: "Total Applications",
+      label: t("adminpanel.label1"),
       value: "2,345",
       change: "+12%",
-      changeType: "positive",
+      changeType: t("adminpanel.changeP"),
       icon: Mail,
     },
     {
-      label: "Active Jobs",
+      label: t("adminpanel.label2"),
       value: "45",
       change: "+3%",
-      changeType: "positive",
+      changeType: t("adminpanel.changeP"),
       icon: Briefcase,
     },
     {
-      label: "Active Internships",
+      label: t("adminpanel.label3"),
       value: "89",
       change: "+24%",
-      changeType: "positive",
+      changeType: t("adminpanel.changeP"),
       icon: Send,
     },
     {
-      label: "Conversion Rate",
+      label: t("adminpanel.label4"),
       value: "5.25%",
       change: "-1.3%",
-      changeType: "negative",
+      changeType: t("adminpanel.changeN"),
       icon: BarChart3,
     },
   ];
 
   const menuItems = [
     {
-      title: "View Applications",
-      description:
-        "View and manage all applications from candidates.",
+      title: t("adminpanel.title1"),
+      description:t("adminpanel.menuitemdesc1"),
       icon: Mail,
       link: "/applications",
       color: "bg-blue-600",
@@ -55,9 +56,8 @@ const AdminPanel = () => {
       iconColor: "text-blue-600",
     },
     {
-      title: "Post Job",
-      description:
-        "Create and publish new job opportunities.",
+      title: t("adminpanel.title2"),
+      description:t("adminpanel.menuitemdesc2"),
       icon: Briefcase,
       link: "/postJob",
       color: "bg-emerald-600",
@@ -65,9 +65,8 @@ const AdminPanel = () => {
       iconColor: "text-emerald-600",
     },
     {
-      title: "Post Internship",
-      description:
-        "Create and manage internship positions.",
+      title: t("adminpanel.title3"),
+      description:t("adminpanel.menuitemdesc3"),
       icon: Send,
       link: "/postInternship",
       color: "bg-violet-600",
@@ -75,9 +74,8 @@ const AdminPanel = () => {
       iconColor: "text-violet-600",
     },
     {
-      title: "Manage Users",
-      description:
-        "View and manage registered user accounts.",
+      title: t("adminpanel.title4"),
+      description:t("adminpanel.menuitemdesc4"),
       icon: Users,
       link: "/users",
       color: "bg-orange-600",
@@ -85,9 +83,8 @@ const AdminPanel = () => {
       iconColor: "text-orange-600",
     },
     {
-      title: "Analytics",
-      description:
-        "View detailed reports and platform statistics.",
+      title: t("adminpanel.title5"),
+      description:t("adminpanel.menuitemdesc5"),
       icon: BarChart3,
       link: "/analytics",
       color: "bg-red-600",
@@ -95,9 +92,8 @@ const AdminPanel = () => {
       iconColor: "text-red-600",
     },
     {
-      title: "Settings",
-      description:
-        "Configure system preferences and settings.",
+      title: t("adminpanel.title6"),
+      description:t("adminpanel.menuitemdesc6"),
       icon: Settings,
       link: "/settings",
       color: "bg-slate-700",
@@ -125,16 +121,15 @@ const AdminPanel = () => {
             <div>
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold text-blue-100 backdrop-blur">
                 <ShieldCheck className="h-4 w-4" />
-                Admin Control Center
+                {t("adminpanel.admincenter")}
               </div>
 
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
-                Admin Dashboard
+                {t("adminpanel.admindashboard")}
               </h1>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-                Manage your jobs, internships, users and applications
-                from one centralized dashboard.
+                {t("adminpanel.adminmanage")}
               </p>
             </div>
 
@@ -151,15 +146,15 @@ const AdminPanel = () => {
         <section className="mb-8">
           <div className="mb-4">
             <h2 className="text-xl font-bold text-slate-900">
-              Overview
+              {t("adminpanel.stat1")}
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Quick view of your platform performance.
+              {t("adminpanel.stat2")}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
 
@@ -204,11 +199,11 @@ const AdminPanel = () => {
         <section>
           <div className="mb-4">
             <h2 className="text-xl font-bold text-slate-900">
-              Management
+              {t("adminpanel.managment1")}
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Choose an area to manage.
+              {t("adminpanel.managment2")}
             </p>
           </div>
 
@@ -253,7 +248,7 @@ const AdminPanel = () => {
 
                   <div className="mt-5 border-t border-slate-100 pt-4">
                     <span className="text-xs font-bold text-slate-400 transition-colors group-hover:text-blue-600">
-                      Open Management →
+                      {t("adminpanel.managment3")} →
                     </span>
                   </div>
                 </Link>
@@ -272,13 +267,11 @@ const AdminPanel = () => {
 
             <div>
               <h3 className="text-sm font-bold text-blue-900">
-                Admin Access
+                {t("adminpanel.info1")}
               </h3>
 
               <p className="mt-1 text-xs leading-5 text-blue-700 sm:text-sm">
-                You are viewing the administrative control panel.
-                Changes made here may affect users, applications and
-                opportunities across the platform.
+                {t("adminpanel.info2")}
               </p>
             </div>
           </div>

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import MessageBubble from "./MessageBubble";
+import { useLanguage } from "@/context/LanguageContext";
 
 const API_URL = "http://localhost:5000";
 
@@ -96,6 +97,7 @@ interface NotificationData {
 }
 
 const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
+  const { t } = useLanguage();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const previousMessages = useRef<Map<string, string>>(new Map());
@@ -875,26 +877,30 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
           }}
           className="
     fixed
-    bottom-6
-    right-6
+    bottom-4
+    right-4
+    sm:bottom-6
+    sm:right-6
     z-[100]
     flex
-    w-40
     items-center
     justify-center
     gap-2
-    rounded-lg
+    rounded-full
+    sm:rounded-lg
     bg-green-500
-    px-4
-    py-3
+    p-3.5
+    sm:px-4
+    sm:py-3
     text-white
     shadow-xl
     hover:bg-green-600
+    active:scale-95
     transition
   "
         >
           <div className="relative">
-            <MessageCircle size={26} />
+            <MessageCircle size={24} className="sm:w-[26px] sm:h-[26px]" />
 
             {/* ==================================
         TOTAL UNREAD BADGE
@@ -904,10 +910,10 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
               <span
                 className="
           absolute
-          -right-3
-          -top-3
-          min-w-[20px]
-          h-5
+          -right-2.5
+          -top-2.5
+          min-w-[18px]
+          h-4.5
           px-1
           rounded-full
           bg-red-500
@@ -926,7 +932,7 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
             )}
           </div>
 
-          <span className="font-bold">Message</span>
+          <span className="hidden sm:inline font-bold">{t("publicSpace.chat.message")}</span>
         </button>
       )}
 
@@ -938,16 +944,21 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
         <div
           className="
             fixed
-            bottom-5
-            right-5
+            bottom-2
+            right-2
+            sm:bottom-5
+            sm:right-5
             z-[100]
             flex
             w-[720px]
-            max-w-[calc(100vw-32px)]
-            h-[520px]
-            max-h-[calc(100vh-40px)]
+            max-w-[calc(100vw-16px)]
+            sm:max-w-[calc(100vw-32px)]
+            h-[80vh]
+            sm:h-[520px]
+            max-h-[calc(100vh-20px)]
             overflow-hidden
-            rounded-2xl
+            rounded-xl
+            sm:rounded-2xl
             border
             border-gray-200
             bg-white
@@ -975,7 +986,7 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
             <div className="px-5 pt-5 pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold text-gray-900">Messages</h2>
+                  <h2 className="text-xl font-bold text-gray-900">{t("publicSpace.chat.messagesTitle")}</h2>
 
                   <MessageCircle size={19} className="text-green-500" />
                 </div>
@@ -1005,7 +1016,7 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
 
                 <input
                   type="text"
-                  placeholder="Search user"
+                  placeholder={t("publicSpace.chat.searchUserPlaceholder")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="
@@ -1036,13 +1047,13 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
                 <>
                   {searchLoading ? (
                     <div className="h-full flex items-center justify-center">
-                      <p className="text-sm text-gray-500">Searching...</p>
+                      <p className="text-sm text-gray-500">{t("publicSpace.chat.searching")}</p>
                     </div>
                   ) : searchResults.length > 0 ? (
                     <div>
                       <div className="px-4 py-2">
                         <p className="text-xs font-semibold text-gray-500 uppercase">
-                          Users
+                          {t("publicSpace.chat.usersHeader")}
                         </p>
                       </div>
 
@@ -1116,7 +1127,7 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
                     </div>
                   ) : (
                     <div className="h-full flex items-center justify-center px-6 text-center">
-                      <p className="text-sm text-gray-500">No users found.</p>
+                      <p className="text-sm text-gray-500">{t("publicSpace.chat.noUsers")}</p>
                     </div>
                   )}
                 </>
@@ -1124,10 +1135,10 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
                 <div className="h-full flex flex-col items-center justify-center px-6 text-center">
                   <MessageCircle size={32} className="text-green-500 mb-3" />
 
-                  <p className="font-semibold text-gray-800">No messages yet</p>
+                  <p className="font-semibold text-gray-800">{t("publicSpace.chat.noMessages")}</p>
 
                   <p className="text-xs text-gray-500 mt-1">
-                    Search for a user to start chatting.
+                    {t("publicSpace.chat.startChatPrompt")}
                   </p>
                 </div>
               ) : (
@@ -1252,8 +1263,8 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
                             `}
                         >
                           {lastMessage?.messageType === "post"
-                            ? "Shared a post."
-                            : lastText || "Start Chatting"}
+                            ? t("publicSpace.chat.sharedPostPreview")
+                            : lastText || t("publicSpace.chat.startChatting")}
                         </p>
                       </div>
                     </button>
@@ -1286,11 +1297,11 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
                   />
 
                   <h3 className="text-lg font-semibold text-gray-800">
-                    Your Messages
+                    {t("publicSpace.chat.yourMessages")}
                   </h3>
 
                   <p className="text-sm text-gray-500 mt-1">
-                    Select a conversation.
+                    {t("publicSpace.chat.selectConversation")}
                   </p>
                 </div>
               </div>
@@ -1368,7 +1379,7 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
                       {selectedUser.name}
                     </h3>
 
-                    <p className="text-xs text-green-500">Active now</p>
+                    <p className="text-xs text-green-500">{t("publicSpace.chat.activeNow")}</p>
                   </div>
 
                   <button
@@ -1393,11 +1404,11 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
                         />
 
                         <p className="text-sm font-medium text-gray-700">
-                          Say hello to {selectedUser.name}
+                          {t("publicSpace.chat.sayHelloTo")} {selectedUser.name}
                         </p>
 
                         <p className="text-xs text-gray-400 mt-1">
-                          Start the conversation
+                          {t("publicSpace.chat.startConversation")}
                         </p>
                       </div>
                     </div>
@@ -1431,7 +1442,7 @@ const Chat = ({ currentUserId, onOpenPost }: ChatProps) => {
                           sendMessage();
                         }
                       }}
-                      placeholder={`Message ${selectedUser.name}...`}
+                      placeholder={`${t("publicSpace.chat.messageUser")} ${selectedUser.name}...`}
                       className="
                         flex-1
                         bg-transparent

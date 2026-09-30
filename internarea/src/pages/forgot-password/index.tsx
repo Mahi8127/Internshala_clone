@@ -5,8 +5,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { Mail, Phone, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ForgotPassword() {
+  const { t } = useLanguage();
   const [identifier, setIdentifier] = useState("");
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -14,7 +16,7 @@ export default function ForgotPassword() {
 
   const handleReset = async () => {
     if (!identifier.trim()) {
-      toast.error("Please enter email or phone number");
+      toast.error(t("auth.forgotPassword.enterIdentifier"));
       return;
     }
 
@@ -32,7 +34,7 @@ export default function ForgotPassword() {
       setNewPassword(response.data.password);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Something went wrong"
+        error.response?.data?.message || t("auth.forgotPassword.somethingWrong")
       );
     } finally {
       setLoading(false);
@@ -50,7 +52,7 @@ export default function ForgotPassword() {
             className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-black transition mb-6"
           >
             <ArrowLeft size={17} />
-            Back to Login
+            {t("auth.forgotPassword.backToLogin")}
           </Link>
 
           {/* Header */}
@@ -60,19 +62,18 @@ export default function ForgotPassword() {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Forgot Password?
+              {t("auth.forgotPassword.title")}
             </h1>
 
             <p className="mt-2 text-sm sm:text-base text-gray-500 leading-relaxed">
-              Enter your registered email or phone number to reset your
-              password.
+              {t("auth.forgotPassword.subtitle")}
             </p>
           </div>
 
           {/* Identifier */}
           <div className="mb-5">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email or Phone Number
+              {t("auth.forgotPassword.identifierLabel")}
             </label>
 
             <div className="relative">
@@ -82,7 +83,7 @@ export default function ForgotPassword() {
 
               <input
                 type="text"
-                placeholder="Enter email or phone"
+                placeholder={t("auth.forgotPassword.identifierPlaceholder")}
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 onKeyDown={(e) => {
@@ -102,7 +103,7 @@ export default function ForgotPassword() {
             disabled={loading}
             className="w-full h-12 bg-black text-white rounded-xl font-semibold text-sm sm:text-base transition hover:bg-gray-800 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {loading ? "Resetting..." : "Reset Password"}
+            {loading ? t("auth.forgotPassword.submitting") : t("auth.forgotPassword.submit")}
           </button>
 
           {/* New Password */}
@@ -112,12 +113,12 @@ export default function ForgotPassword() {
                 <Lock size={17} className="text-green-700" />
 
                 <p className="font-semibold text-green-800">
-                  Password Reset Successful
+                  {t("auth.forgotPassword.resetSuccess")}
                 </p>
               </div>
 
               <p className="text-sm text-green-700 mb-3">
-                Your new password is:
+                {t("auth.forgotPassword.newPasswordIs")}
               </p>
 
               <div className="relative">
@@ -133,7 +134,7 @@ export default function ForgotPassword() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
                   aria-label={
-                    showPassword ? "Hide password" : "Show password"
+                    showPassword ? t("auth.forgotPassword.hidePassword") : t("auth.forgotPassword.showPassword")
                   }
                 >
                   {showPassword ? (
@@ -145,7 +146,7 @@ export default function ForgotPassword() {
               </div>
 
               <p className="mt-3 text-xs text-green-700">
-                Please save this password securely and use it to log in.
+                {t("auth.forgotPassword.saveSecurely")}
               </p>
             </div>
           )}
@@ -153,18 +154,18 @@ export default function ForgotPassword() {
           {/* Login Link */}
           <div className="text-center mt-6">
             <span className="text-sm text-gray-500">
-              Remember your password?{" "}
+              {t("auth.forgotPassword.rememberPassword")}{" "}
             </span>
 
             <Link
               href="/login"
               className="text-sm font-semibold text-black hover:underline"
             >
-              Login
+              {t("auth.forgotPassword.loginLink")}
             </Link>
           </div>
         </div>
       </div>
     </main>
   );
-}
+}

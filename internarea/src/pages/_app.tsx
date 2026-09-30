@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import Script from "next/script";
 import { useEffect } from "react";
 import { Provider, useDispatch } from "react-redux";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Fotter";
@@ -44,46 +45,43 @@ function AuthListener() {
   return null;
 }
 
-export default function App({
-  Component,
-  pageProps,
-}: AppProps) {
+export default function App({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
-      <AuthListener />
+      <LanguageProvider>
+        <AuthListener />
 
-      <div className="min-h-screen flex flex-col bg-white">
+        <div className="min-h-screen flex flex-col bg-white">
+          {/* Toast Notifications */}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+            }}
+          />
 
-        {/* Toast Notifications */}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 3000,
-          }}
-        />
+          {/* Razorpay Checkout */}
+          <Script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            strategy="afterInteractive"
+          />
 
-        {/* Razorpay Checkout */}
-        <Script
-          src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="afterInteractive"
-        />
+          {/* Navbar */}
+          <header className="shrink-0">
+            <Navbar />
+          </header>
 
-        {/* Navbar */}
-        <header className="shrink-0">
-          <Navbar />
-        </header>
+          {/* Page Content */}
+          <main className="flex-1 w-full">
+            <Component {...pageProps} />
+          </main>
 
-        {/* Page Content */}
-        <main className="flex-1 w-full">
-          <Component {...pageProps} />
-        </main>
-
-        {/* Footer */}
-        <footer className="shrink-0">
-          <Footer />
-        </footer>
-
-      </div>
+          {/* Footer */}
+          <footer className="shrink-0">
+            <Footer />
+          </footer>
+        </div>
+      </LanguageProvider>
     </Provider>
   );
 }

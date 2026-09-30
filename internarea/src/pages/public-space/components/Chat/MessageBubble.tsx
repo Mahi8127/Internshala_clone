@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const API_URL = "http://localhost:5000";
 
@@ -68,6 +69,7 @@ const MessageBubble = ({
   currentUserId,
   onOpenPost,
 }: MessageBubbleProps) => {
+  const { t } = useLanguage();
   // ==========================================
   // SENDER
   // ==========================================
@@ -185,7 +187,7 @@ const MessageBubble = ({
         postOwner?.fullName ||
         postOwner?.username ||
         "User"
-      : "Shared post";
+      : t("publicSpace.chat.sharedPost");
 
   // ==========================================
   // OWNER PHOTO
@@ -317,7 +319,7 @@ const MessageBubble = ({
             </p>
           ) : (
             <p className="text-xs opacity-60">
-              Message
+              {t("publicSpace.chat.message")}
             </p>
           )}
 
@@ -449,7 +451,7 @@ const MessageBubble = ({
                   }
                 `}
               >
-                Shared a post
+                {t("publicSpace.chat.sharedPostPreview")}
               </p>
             </div>
           </div>
@@ -475,7 +477,7 @@ const MessageBubble = ({
               ) : (
                 <img
                   src={mediaUrl}
-                  alt="Shared post"
+                  alt={t("publicSpace.chat.sharedPost")}
                   className="
                     w-full
                     h-[180px]
@@ -529,7 +531,7 @@ const MessageBubble = ({
             `}
           >
             <p className="text-xs font-semibold">
-              Tap to open post
+              {t("publicSpace.chat.tapToOpenPost")}
             </p>
           </div>
         </button>

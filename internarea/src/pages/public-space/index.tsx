@@ -18,6 +18,7 @@ import {
 import toast from "react-hot-toast";
 
 import Chat from "./components/Chat/Chat";
+import { useLanguage } from "@/context/LanguageContext";
 
 import {
   selectuser,
@@ -31,6 +32,7 @@ const API_URL =
   "http://localhost:5000";
 
 const PublicSpace = () => {
+  const { t } = useLanguage();
   const user =
     useSelector(selectuser);
 
@@ -134,7 +136,7 @@ const PublicSpace = () => {
   ) => {
     if (!currentUserId) {
       toast.error(
-        "Please login first.",
+        t("publicSpace.loginFirst"),
       );
 
       return;
@@ -203,7 +205,7 @@ const PublicSpace = () => {
       );
 
       toast.error(
-        "Failed to like post.",
+        t("publicSpace.toasts.failedLike"),
       );
     }
   };
@@ -218,7 +220,7 @@ const PublicSpace = () => {
   ) => {
     if (!currentUserId) {
       toast.error(
-        "Please login first.",
+        t("publicSpace.loginFirst"),
       );
 
       return;
@@ -284,7 +286,7 @@ const PublicSpace = () => {
       );
 
       toast.error(
-        "Failed to add comment.",
+        t("publicSpace.toasts.failedComment"),
       );
     }
   };
@@ -298,7 +300,7 @@ const PublicSpace = () => {
   ) => {
     if (!currentUserId) {
       toast.error(
-        "Please login first.",
+        t("publicSpace.loginFirst"),
       );
 
       return;
@@ -322,7 +324,7 @@ const PublicSpace = () => {
   ) => {
     if (!currentUserId) {
       toast.error(
-        "Please login first.",
+        t("publicSpace.loginFirst"),
       );
 
       return;
@@ -343,7 +345,7 @@ const PublicSpace = () => {
 
     const newCaption =
       window.prompt(
-        "Edit your caption:",
+        t("publicSpace.editPrompt"),
         post.caption || "",
       );
 
@@ -394,7 +396,7 @@ const PublicSpace = () => {
       );
 
       toast.error(
-        "Failed to edit post.",
+        t("publicSpace.toasts.failedEdit"),
       );
     }
   };
@@ -408,7 +410,7 @@ const PublicSpace = () => {
   ) => {
     if (!currentUserId) {
       toast.error(
-        "Please login first.",
+        t("publicSpace.loginFirst"),
       );
 
       return;
@@ -416,7 +418,7 @@ const PublicSpace = () => {
 
     const confirmed =
       window.confirm(
-        "Are you sure you want to delete this post?",
+        t("publicSpace.deleteConfirm"),
       );
 
     if (!confirmed) {
@@ -477,7 +479,7 @@ const PublicSpace = () => {
       );
 
       toast.error(
-        "Failed to delete post.",
+        t("publicSpace.toasts.failedDelete"),
       );
     }
   };
@@ -491,7 +493,7 @@ const PublicSpace = () => {
   ) => {
     if (!postReference) {
       toast.error(
-        "Post is unavailable.",
+        t("publicSpace.toasts.postUnavailable"),
       );
 
       return;
@@ -550,7 +552,7 @@ const PublicSpace = () => {
 
     if (!postId) {
       toast.error(
-        "Post is unavailable.",
+        t("publicSpace.toasts.postUnavailable"),
       );
 
       return;
@@ -605,7 +607,7 @@ const PublicSpace = () => {
 
       if (!foundPost) {
         toast.error(
-          "This post is no longer available.",
+          t("publicSpace.toasts.postNoLongerAvailable"),
         );
 
         return;
@@ -625,7 +627,7 @@ const PublicSpace = () => {
       );
 
       toast.error(
-        "Could not open post.",
+        t("publicSpace.toasts.couldNotOpenPost"),
       );
     }
   };
@@ -641,11 +643,11 @@ const PublicSpace = () => {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Public Space
+            {t("publicSpace.title")}
           </h1>
 
           <p className="mt-2 text-gray-500">
-            Share your thoughts, photos and videos with the community.
+            {t("publicSpace.description")}
           </p>
         </div>
 
@@ -668,11 +670,11 @@ const PublicSpace = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Community Feed
+                  {t("publicSpace.communityFeed")}
                 </h2>
 
                 <p className="text-sm text-gray-500 mt-1">
-                  Latest posts from the community
+                  {t("publicSpace.latestPosts")}
                 </p>
               </div>
 
@@ -708,7 +710,7 @@ const PublicSpace = () => {
                   }
                 />
 
-                Refresh
+                {t("publicSpace.refresh")}
               </button>
             </div>
 
@@ -720,18 +722,18 @@ const PublicSpace = () => {
                 />
 
                 <p className="mt-3 text-sm text-gray-500">
-                  Loading posts...
+                  {t("publicSpace.loadingPosts")}
                 </p>
               </div>
             ) : posts.length ===
               0 ? (
               <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center">
                 <h3 className="text-lg font-semibold text-gray-800">
-                  No posts yet
+                  {t("publicSpace.noPostsTitle")}
                 </h3>
 
                 <p className="mt-2 text-sm text-gray-500">
-                  Be the first person to share something with the community!
+                  {t("publicSpace.noPostsDesc")}
                 </p>
               </div>
             ) : (

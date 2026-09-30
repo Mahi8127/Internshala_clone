@@ -1,3 +1,4 @@
+import { useLanguage } from "@/context/LanguageContext";
 import axios from "axios";
 import {
   Building2,
@@ -70,11 +71,25 @@ const formatDate = (date?: string) => {
 };
 
 const Applications = () => {
+  const {t} = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
   const [data, setData] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const getStatusLabel = (statusStr: string = "") => {
+    switch (statusStr.toLowerCase()) {
+      case "accepted":
+        return t("application.app6");
+      case "rejected":
+        return t("application.app7");
+      case "pending":
+        return t("application.app5");
+      default:
+        return statusStr;
+    }
+  };
 
   // --------------------------------------------------
   // Fetch applications
@@ -92,14 +107,14 @@ const Applications = () => {
         setData(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.error("Error fetching applications:", error);
-        toast.error("Unable to load applications");
+        toast.error(t("application.toastLoadError"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [t]);
 
   // --------------------------------------------------
   // Filter applications
@@ -173,12 +188,12 @@ const Applications = () => {
 
       toast.success(
         action === "accepted"
-          ? "Application accepted"
-          : "Application rejected"
+          ? t("application.toastAccepted")
+          : t("application.toastRejected")
       );
     } catch (error) {
       console.error("Error updating application:", error);
-      toast.error("Error updating application");
+      toast.error(t("application.toastUpdateError"));
     } finally {
       setUpdatingId(null);
     }
@@ -264,37 +279,36 @@ const Applications = () => {
             <div>
               <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold backdrop-blur">
                 <BriefcaseBusiness className="h-3.5 w-3.5" />
-                Application Management
+                {t("application.app1")}
               </div>
 
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Applications
+                {t("application.app2")}
               </h1>
 
               <p className="mt-2 max-w-xl text-sm leading-6 text-blue-100 sm:text-base">
-                Manage and review internship and job applications
-                from one place.
+                {t("application.app3")}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
-                <p className="text-xs text-blue-200">Total</p>
+                <p className="text-xs text-blue-200">{t("application.app4")}</p>
                 <p className="mt-1 text-2xl font-bold">{counts.all}</p>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
-                <p className="text-xs text-blue-200">Pending</p>
+                <p className="text-xs text-blue-200">{t("application.app5")}</p>
                 <p className="mt-1 text-2xl font-bold">{counts.pending}</p>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
-                <p className="text-xs text-blue-200">Accepted</p>
+                <p className="text-xs text-blue-200">{t("application.app6")}</p>
                 <p className="mt-1 text-2xl font-bold">{counts.accepted}</p>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
-                <p className="text-xs text-blue-200">Rejected</p>
+                <p className="text-xs text-blue-200">{t("application.app7")}</p>
                 <p className="mt-1 text-2xl font-bold">{counts.rejected}</p>
               </div>
             </div>
@@ -321,7 +335,7 @@ const Applications = () => {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search company, category, or applicant..."
+                  placeholder={t("application.app8")}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-4 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                 />
               </div>
@@ -331,25 +345,25 @@ const Applications = () => {
               <div className="flex gap-2 overflow-x-auto pb-1">
                 <FilterButton
                   value="all"
-                  label="All"
+                  label={t("application.app4")}
                   count={counts.all}
                 />
 
                 <FilterButton
                   value="pending"
-                  label="Pending"
+                  label={t("application.app5")}
                   count={counts.pending}
                 />
 
                 <FilterButton
                   value="accepted"
-                  label="Accepted"
+                  label={t("application.app6")}
                   count={counts.accepted}
                 />
 
                 <FilterButton
                   value="rejected"
-                  label="Rejected"
+                  label={t("application.app7")}
                   count={counts.rejected}
                 />
               </div>
@@ -365,23 +379,23 @@ const Applications = () => {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Company
+                    {t("application.app9")}
                   </th>
 
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Applicant
+                    {t("application.app10")}
                   </th>
 
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Applied Date
+                    {t("application.app11")}
                   </th>
 
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Status
+                    {t("application.app12")}
                   </th>
 
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Actions
+                    {t("application.app13")}
                   </th>
                 </tr>
               </thead>
@@ -407,12 +421,12 @@ const Applications = () => {
 
                           <div>
                             <p className="font-bold text-slate-900">
-                              {application.company || "Unknown Company"}
+                              {application.company || t("application.app14")}
                             </p>
 
                             <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
                               <Tag className="h-3.5 w-3.5" />
-                              {application.category || "Uncategorized"}
+                              {application.category || t("application.app15")}
                             </div>
                           </div>
                         </div>
@@ -428,11 +442,11 @@ const Applications = () => {
 
                           <div>
                             <p className="font-semibold text-slate-800">
-                              {application.user?.name || "Unknown User"}
+                              {application.user?.name || t("application.app16")}
                             </p>
 
                             <p className="mt-0.5 text-sm text-slate-500">
-                              {application.user?.email || "No email"}
+                              {application.user?.email || t("application.app17")}
                             </p>
                           </div>
                         </div>
@@ -461,7 +475,7 @@ const Applications = () => {
                             )}`}
                           />
 
-                          {status}
+                          {getStatusLabel(status)}
                         </span>
                       </td>
 
@@ -473,7 +487,7 @@ const Applications = () => {
                             href={`/detailapplication/${application._id}`}
                             className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-600 transition hover:bg-blue-100"
                           >
-                            View
+                            {t("application.app18")}
                           </Link>
 
                           <button
@@ -486,7 +500,7 @@ const Applications = () => {
                               )
                             }
                             className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
-                            title="Accept application"
+                            title={t("application.app21")}
                           >
                             <CheckCircle2 className="h-4 w-4" />
                           </button>
@@ -501,7 +515,7 @@ const Applications = () => {
                               )
                             }
                             className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-                            title="Reject application"
+                            title={t("application.app22")}
                           >
                             <XCircle className="h-4 w-4" />
                           </button>
@@ -539,14 +553,14 @@ const Applications = () => {
 
                       <div className="min-w-0">
                         <h3 className="truncate font-bold text-slate-900">
-                          {application.company || "Unknown Company"}
+                          {application.company || t("application.app14")}
                         </h3>
 
                         <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
                           <Tag className="h-3.5 w-3.5" />
 
                           <span className="truncate">
-                            {application.category || "Uncategorized"}
+                            {application.category || t("application.app15")}
                           </span>
                         </div>
                       </div>
@@ -563,7 +577,7 @@ const Applications = () => {
                         )}`}
                       />
 
-                      {status}
+                      {getStatusLabel(status)}
                     </span>
                   </div>
 
@@ -577,14 +591,14 @@ const Applications = () => {
 
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-slate-800">
-                          {application.user?.name || "Unknown User"}
+                          {application.user?.name || t("application.app16")}
                         </p>
 
                         <div className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
                           <Mail className="h-3 w-3" />
 
                           <span className="truncate">
-                            {application.user?.email || "No email"}
+                            {application.user?.email || t("application.app17")}
                           </span>
                         </div>
                       </div>
@@ -595,17 +609,17 @@ const Applications = () => {
 
                   <div className="mt-3 flex items-center gap-2 text-xs font-medium text-slate-500">
                     <Clock3 className="h-4 w-4" />
-                    Applied {formatDate(application.createdAt)}
+                    {t("application.app19")} {formatDate(application.createdAt)}
                   </div>
 
                   {/* Actions */}
 
-                  <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className="mt-4 grid grid-cols-1 xs:grid-cols-3 gap-2">
                     <Link
                       href={`/detailapplication/${application._id}`}
-                      className="flex min-h-10 items-center justify-center rounded-xl bg-blue-600 px-3 text-xs font-bold text-white transition hover:bg-blue-700"
+                      className="flex min-h-10 items-center justify-center rounded-xl bg-blue-600 px-3 py-2 text-center text-xs font-bold text-white transition hover:bg-blue-700"
                     >
-                      View Details
+                      {t("application.app20")}
                     </Link>
 
                     <button
@@ -617,10 +631,10 @@ const Applications = () => {
                           "accepted"
                         )
                       }
-                      className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-emerald-50 px-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-emerald-50 px-2 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <CheckCircle2 className="h-4 w-4" />
-                      Accept
+                      <CheckCircle2 className="h-4 w-4 shrink-0" />
+                      <span>{t("application.app21")}</span>
                     </button>
 
                     <button
@@ -632,10 +646,10 @@ const Applications = () => {
                           "rejected"
                         )
                       }
-                      className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-red-50 px-2 text-xs font-bold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-red-50 px-2 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <XCircle className="h-4 w-4" />
-                      Reject
+                      <XCircle className="h-4 w-4 shrink-0" />
+                      <span>{t("application.app22")}</span>
                     </button>
                   </div>
                 </div>
@@ -654,13 +668,13 @@ const Applications = () => {
               </div>
 
               <h3 className="mt-5 text-lg font-bold text-slate-800">
-                No applications found
+                {t("application.app23")}
               </h3>
 
               <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
                 {searchTerm
-                  ? "Try changing your search term or selected filter."
-                  : "There are currently no applications matching this filter."}
+                  ? t("application.emptyFiltered")
+                  : t("application.emptyDefault")}
               </p>
 
               {(searchTerm || filter !== "all") && (
@@ -672,7 +686,7 @@ const Applications = () => {
                   }}
                   className="mt-5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
                 >
-                  Clear Filters
+                  {t("application.app24")}
                 </button>
               )}
             </div>

@@ -13,6 +13,7 @@ const loginHistory = require("./Routes/loginHistory");
 const friendRoutes = require("./Routes/friendRoutes");
 const postRoutes = require("./Routes/postRoutes");
 const messageRoutes = require("./Routes/messageRoutes");
+const languageRoutes = require("./Routes/languageRoutes");
 
 app.use(cors());
 app.use(bodyparser.json({ limit: "50mb" }));
@@ -23,6 +24,7 @@ app.use("/api/login-history", loginHistory);
 app.use("/api/friends", friendRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/language", languageRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello this is internshala backend");
@@ -39,5 +41,3 @@ app.use((req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-

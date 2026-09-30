@@ -1,3 +1,4 @@
+import { useLanguage } from "@/context/LanguageContext";
 import axios from "axios";
 import {
   ArrowLeft,
@@ -55,11 +56,25 @@ const formatDate = (date?: string) => {
 };
 
 const DetailApplication = () => {
+  const { t } = useLanguage();
   const router = useRouter();
   const { id } = router.query;
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+
+  const getStatusLabel = (statusStr: string = "") => {
+    switch (statusStr.toLowerCase()) {
+      case "accepted":
+        return t("application.app6");
+      case "rejected":
+        return t("application.app7");
+      case "pending":
+        return t("application.app5");
+      default:
+        return statusStr;
+    }
+  };
 
   // --------------------------------------------------
   // Fetch application
@@ -100,11 +115,11 @@ const DetailApplication = () => {
           </div>
 
           <h2 className="mt-5 text-lg font-bold text-slate-800">
-            Loading application
+            {t("detailapplication.loading")}
           </h2>
 
           <p className="mt-1 text-sm text-slate-500">
-            Fetching application details...
+            {t("detailapplication.fetching")}
           </p>
         </div>
       </main>
@@ -124,11 +139,11 @@ const DetailApplication = () => {
           </div>
 
           <h2 className="mt-5 text-xl font-bold text-slate-900">
-            Application not found
+            {t("detailapplication.notFound")}
           </h2>
 
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            We couldn't load the requested application.
+            {t("detailapplication.notFoundDesc")}
           </p>
 
           <button
@@ -137,7 +152,7 @@ const DetailApplication = () => {
             className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
           >
             <ArrowLeft className="h-4 w-4" />
-            Go Back
+            {t("detailapplication.goBack")}
           </button>
         </div>
       </main>
@@ -162,7 +177,7 @@ const DetailApplication = () => {
           className="mb-5 inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-blue-200 hover:text-blue-600"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back
+          {t("detailapplication.back")}
         </button>
 
         {/* ==================================================
@@ -183,7 +198,7 @@ const DetailApplication = () => {
                 {data?.user?.photo ? (
                   <img
                     src={data.user.photo}
-                    alt={data?.user?.name || "Applicant"}
+                    alt={data?.user?.name || t("detailapplication.applicantResume")}
                     className="h-24 w-24 rounded-2xl border-4 border-white/20 object-cover shadow-xl sm:h-28 sm:w-28"
                   />
                 ) : (
@@ -197,11 +212,11 @@ const DetailApplication = () => {
 
               <div className="min-w-0 flex-1 text-center sm:text-left">
                 <p className="text-xs font-semibold uppercase tracking-wider text-blue-300">
-                  Internship Application
+                  {t("detailapplication.title")}
                 </p>
 
                 <h1 className="mt-1 truncate text-2xl font-extrabold sm:text-3xl">
-                  {data?.user?.name || "Unknown Applicant"}
+                  {data?.user?.name || t("application.app16")}
                 </h1>
 
                 <div className="mt-3 flex flex-col gap-2 text-sm text-blue-100 sm:flex-row sm:flex-wrap">
@@ -233,7 +248,7 @@ const DetailApplication = () => {
                     }`}
                   />
 
-                  {status}
+                  {getStatusLabel(status)}
                 </span>
               </div>
             </div>
@@ -255,7 +270,7 @@ const DetailApplication = () => {
 
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Company
+                    {t("application.app9")}
                   </p>
 
                   <p className="mt-1 font-bold text-slate-900">
@@ -275,7 +290,7 @@ const DetailApplication = () => {
 
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Applied On
+                    {t("application.app11")}
                   </p>
 
                   <p className="mt-1 font-bold text-slate-900">
@@ -298,11 +313,11 @@ const DetailApplication = () => {
 
               <div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  Cover Letter
+                  {t("detailapplication.coverLetter")}
                 </h2>
 
                 <p className="text-xs text-slate-500">
-                  Applicant's submitted cover letter
+                  {t("detailapplication.coverLetterDesc")}
                 </p>
               </div>
             </div>
@@ -314,7 +329,7 @@ const DetailApplication = () => {
                 </p>
               ) : (
                 <p className="text-sm italic text-slate-400">
-                  No cover letter was provided.
+                  {t("detailapplication.noCoverLetter")}
                 </p>
               )}
             </div>
@@ -332,11 +347,11 @@ const DetailApplication = () => {
 
               <div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  Attached Resume
+                  {t("detailapplication.attachedResume")}
                 </h2>
 
                 <p className="text-xs text-slate-500">
-                  Resume submitted with this application
+                  {t("detailapplication.resumeDesc")}
                 </p>
               </div>
             </div>
@@ -347,7 +362,7 @@ const DetailApplication = () => {
 
                   <div className="min-w-0">
                     <h3 className="truncate text-lg font-bold text-slate-900">
-                      {data.resume.fullname || "Applicant Resume"}
+                      {data.resume.fullname || t("detailapplication.applicantResume")}
                     </h3>
 
                     {data.resume.email && (
@@ -359,7 +374,7 @@ const DetailApplication = () => {
 
                     <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
                       <CheckCircle2 className="h-4 w-4" />
-                      Resume attached successfully
+                      {t("detailapplication.resumeAttached")}
                     </div>
                   </div>
 
@@ -370,7 +385,7 @@ const DetailApplication = () => {
                     className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 sm:w-auto"
                   >
                     <FileText className="h-4 w-4" />
-                    View Resume
+                    {t("detailapplication.viewResume")}
                   </a>
                 </div>
               </div>
@@ -380,7 +395,7 @@ const DetailApplication = () => {
                   <XCircle className="h-5 w-5 text-red-500" />
 
                   <p className="text-sm font-semibold text-red-700">
-                    No resume attached to this application.
+                    {t("detailapplication.noResume")}
                   </p>
                 </div>
               </div>

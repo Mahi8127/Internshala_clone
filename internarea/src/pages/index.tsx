@@ -17,42 +17,45 @@ import {
 
 import Link from "next/link";
 import axios from "axios";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function SvgSlider() {
+  const { t } = useLanguage();
+
   const categories = [
-    "Big Brands",
-    "Work From Home",
-    "Part-time",
-    "MBA",
-    "Engineering",
-    "Media",
-    "Design",
-    "Data Science",
+    { id: "Big Brands", key: "home.categories.bigBrands" },
+    { id: "Work From Home", key: "home.categories.workFromHome" },
+    { id: "Part-time", key: "home.categories.partTime" },
+    { id: "MBA", key: "home.categories.mba" },
+    { id: "Engineering", key: "home.categories.engineering" },
+    { id: "Media", key: "home.categories.media" },
+    { id: "Design", key: "home.categories.design" },
+    { id: "Data Science", key: "home.categories.dataScience" },
   ];
 
   const slides = [
     {
       pattern: "pattern-1",
-      title: "Start Your Career Journey",
-      subtitle: "Discover internships and jobs built for your next step.",
+      titleKey: "home.slides.slide1Title",
+      subtitleKey: "home.slides.slide1Subtitle",
       bgColor: "bg-indigo-600",
     },
     {
       pattern: "pattern-2",
-      title: "Learn From The Best",
-      subtitle: "Find opportunities that help you learn and grow.",
+      titleKey: "home.slides.slide2Title",
+      subtitleKey: "home.slides.slide2Subtitle",
       bgColor: "bg-blue-600",
     },
     {
       pattern: "pattern-3",
-      title: "Grow Your Skills",
-      subtitle: "Build experience with opportunities that match your goals.",
+      titleKey: "home.slides.slide3Title",
+      subtitleKey: "home.slides.slide3Subtitle",
       bgColor: "bg-purple-600",
     },
     {
       pattern: "pattern-4",
-      title: "Connect With Top Companies",
-      subtitle: "Take the next step toward your dream career.",
+      titleKey: "home.slides.slide4Title",
+      subtitleKey: "home.slides.slide4Subtitle",
       bgColor: "bg-teal-600",
     },
   ];
@@ -98,19 +101,19 @@ export default function SvgSlider() {
   const stats = [
     {
       number: "300K+",
-      label: "companies hiring",
+      labelKey: "home.stats.companiesHiring",
     },
     {
       number: "10K+",
-      label: "new openings everyday",
+      labelKey: "home.stats.newOpenings",
     },
     {
       number: "21Mn+",
-      label: "active students",
+      labelKey: "home.stats.activeStudents",
     },
     {
       number: "600K+",
-      label: "learners",
+      labelKey: "home.stats.learners",
     },
   ];
 
@@ -127,17 +130,16 @@ export default function SvgSlider() {
 
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-semibold mb-5">
               <BriefcaseBusiness size={16} />
-              Find your next opportunity
+              {t("home.hero.badge")}
             </div>
 
             <h1 className="max-w-4xl mx-auto text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-slate-900 leading-tight">
-              Make your dream career
-              <span className="text-blue-600"> a reality</span>
+              {t("home.hero.title")}{" "}
+              <span className="text-blue-600">{t("home.hero.titleHighlight")}</span>
             </h1>
 
             <p className="mt-5 text-base sm:text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto">
-              Explore internships and jobs, build your experience,
-              and take the next step in your career.
+              {t("home.hero.subtitle")}
             </p>
 
             <div className="mt-7 flex flex-col sm:flex-row justify-center gap-3">
@@ -146,7 +148,7 @@ export default function SvgSlider() {
                 href="/internship"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:-translate-y-0.5 transition-all duration-200"
               >
-                Explore Internships
+                {t("home.hero.exploreInternships")}
                 <ChevronRight size={18} />
               </Link>
 
@@ -154,7 +156,7 @@ export default function SvgSlider() {
                 href="/job"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold hover:border-blue-400 hover:text-blue-600 transition-all duration-200"
               >
-                Explore Jobs
+                {t("home.hero.exploreJobs")}
               </Link>
 
             </div>
@@ -285,11 +287,11 @@ export default function SvgSlider() {
                     </div>
 
                     <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-                      {slide.title}
+                      {t(slide.titleKey)}
                     </h2>
 
                     <p className="mt-4 text-sm sm:text-base lg:text-lg text-white/85 max-w-xl mx-auto">
-                      {slide.subtitle}
+                      {t(slide.subtitleKey)}
                     </p>
 
                   </div>
@@ -314,11 +316,11 @@ export default function SvgSlider() {
 
             <div>
               <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
-                Explore opportunities
+                {t("home.categories.eyebrow")}
               </p>
 
               <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-slate-900">
-                Find opportunities by category
+                {t("home.categories.title")}
               </h2>
             </div>
 
@@ -327,7 +329,7 @@ export default function SvgSlider() {
                 onClick={() => setSelectedCategory("")}
                 className="self-start lg:self-auto text-sm font-semibold text-blue-600 hover:text-blue-700"
               >
-                Clear filter
+                {t("home.categories.clearFilter")}
               </button>
             )}
 
@@ -343,20 +345,20 @@ export default function SvgSlider() {
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
-              All
+              {t("home.categories.all")}
             </button>
 
             {categories.map((category) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
                 className={`shrink-0 px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
-                  SlectedCategory === category
+                  SlectedCategory === category.id
                     ? "bg-blue-600 text-white shadow-sm"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
               >
-                {category}
+                {t(category.key)}
               </button>
             ))}
 
@@ -371,10 +373,11 @@ export default function SvgSlider() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
         <SectionHeader
-          eyebrow="Internships"
-          title="Latest internships"
-          description="Discover internships that match your skills and interests."
+          eyebrow={t("home.internships.eyebrow")}
+          title={t("home.internships.title")}
+          description={t("home.internships.description")}
           href="/internship"
+          viewAllText={t("home.sections.viewAll")}
         />
 
         {filteredInternships.length > 0 ? (
@@ -397,7 +400,7 @@ export default function SvgSlider() {
 
           </div>
         ) : (
-          <EmptyState text="No internships found for this category." />
+          <EmptyState text={t("home.internships.empty")} />
         )}
 
       </section>
@@ -408,10 +411,11 @@ export default function SvgSlider() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
 
         <SectionHeader
-          eyebrow="Jobs"
-          title="Latest jobs"
-          description="Find your next role and move your career forward."
+          eyebrow={t("home.jobs.eyebrow")}
+          title={t("home.jobs.title")}
+          description={t("home.jobs.description")}
           href="/job"
+          viewAllText={t("home.sections.viewAll")}
         />
 
         {filteredJobs.length > 0 ? (
@@ -432,7 +436,7 @@ export default function SvgSlider() {
 
           </div>
         ) : (
-          <EmptyState text="No jobs found for this category." />
+          <EmptyState text={t("home.jobs.empty")} />
         )}
 
       </section>
@@ -458,7 +462,7 @@ export default function SvgSlider() {
                 </div>
 
                 <div className="mt-2 text-xs sm:text-sm lg:text-base text-slate-600">
-                  {stat.label}
+                  {t(stat.labelKey)}
                 </div>
               </div>
             ))}
@@ -481,12 +485,16 @@ function SectionHeader({
   title,
   description,
   href,
+  viewAllText,
 }: {
   eyebrow: string;
   title: string;
   description: string;
   href: string;
+  viewAllText?: string;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
 
@@ -508,7 +516,7 @@ function SectionHeader({
         href={href}
         className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 shrink-0"
       >
-        View all
+        {viewAllText || t("home.sections.viewAll")}
         <ChevronRight size={17} />
       </Link>
 
@@ -537,6 +545,8 @@ function OpportunityCard({
   secondary: string;
   href: string;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="group bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
@@ -550,13 +560,13 @@ function OpportunityCard({
           </span>
 
           <span className="text-sm font-semibold">
-            Actively hiring
+            {t("home.cards.activelyHiring")}
           </span>
 
         </div>
 
         <span className="shrink-0 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
-          {type}
+          {type === "Job" ? t("home.cards.job") : t("home.cards.internship")}
         </span>
 
       </div>
@@ -577,16 +587,19 @@ function OpportunityCard({
         <DetailRow
           icon={<MapPin size={17} />}
           text={location}
+          fallbackText={t("home.cards.notSpecified")}
         />
 
         <DetailRow
           icon={<Banknote size={17} />}
           text={amount}
+          fallbackText={t("home.cards.notSpecified")}
         />
 
         <DetailRow
           icon={<Calendar size={17} />}
           text={secondary}
+          fallbackText={t("home.cards.notSpecified")}
         />
 
       </div>
@@ -598,7 +611,7 @@ function OpportunityCard({
           href={href}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700"
         >
-          View details
+          {t("home.cards.viewDetails")}
           <ChevronRight
             size={17}
             className="group-hover:translate-x-1 transition-transform"
@@ -618,9 +631,11 @@ function OpportunityCard({
 function DetailRow({
   icon,
   text,
+  fallbackText,
 }: {
   icon: React.ReactNode;
   text: string;
+  fallbackText?: string;
 }) {
   return (
     <div className="flex items-start gap-3 text-sm text-slate-600 min-w-0">
@@ -630,7 +645,7 @@ function DetailRow({
       </span>
 
       <span className="break-words line-clamp-2">
-        {text || "Not specified"}
+        {text || fallbackText || "Not specified"}
       </span>
 
     </div>

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface PostCardProps {
   post: any;
@@ -32,6 +33,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const { t } = useLanguage();
   // Current User
   const currentUser = useSelector(selectuser);
 
@@ -297,7 +299,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   className="w-full px-4 py-3 text-sm text-left flex items-center gap-2 hover:bg-gray-50 transition text-gray-700"
                 >
                   <Pencil size={16} />
-                  <span>Edit Post</span>
+                  <span>{t("publicSpace.postCard.editPost")}</span>
                 </button>
 
                 {/* DELETE POST */}
@@ -307,7 +309,7 @@ const PostCard: React.FC<PostCardProps> = ({
                     setShowMenu(false);
 
                     const confirmed = window.confirm(
-                      "Are you sure you want to delete this post?",
+                      t("publicSpace.postCard.deleteConfirm"),
                     );
                     if (confirmed) {
                       onDelete(post._id);
@@ -316,7 +318,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   className="w-full px-4 py-3 text-sm text-left flex items-center gap-2 text-red-600 hover:bg-red-50 transition"
                 >
                   <Trash2 size={16} />
-                  <span>Delete Post</span>
+                  <span>{t("publicSpace.postCard.deletePost")}</span>
                 </button>
               </div>
             )}
@@ -345,7 +347,7 @@ const PostCard: React.FC<PostCardProps> = ({
           ) : (
             <img
               src={mediaUrl}
-              alt="Post Media"
+              alt={t("publicSpace.postCard.mediaAlt")}
               className="w-full max-h-[600px] object-contain"
             />
           )}
@@ -382,7 +384,7 @@ const PostCard: React.FC<PostCardProps> = ({
             className="flex items-center gap-2 text-sm text-gray-600 hover:text-green-600 transition"
           >
             <Share2 size={20} />
-            <span>Share</span>
+            <span>{t("publicSpace.postCard.share")}</span>
           </button>
         </div>
 
@@ -391,10 +393,10 @@ const PostCard: React.FC<PostCardProps> = ({
           <div className="border-t border-gray-100 mt-3">
             {/* COMMENT LIST */}
             <div className="px-5 pt-4">
-              <h4 className="font-semibold text-gray-500 mb-3">Comments</h4>
+              <h4 className="font-semibold text-gray-500 mb-3">{t("publicSpace.postCard.comments")}</h4>
               {comments.length === 0 ? (
                 <p className="text-sm text-gray-500 mb-4">
-                  No comments yet. Be the first to comment!
+                  {t("publicSpace.postCard.noComments")}
                 </p>
               ) : (
                 <div className="space-y-3 max-h-72 overflow-y-auto">
@@ -444,7 +446,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   onKeyDown={handleCommentKeyDown}
-                  placeholder="Write a comment..."
+                  placeholder={t("publicSpace.postCard.commentPlaceholder")}
                   className="flex-1 outline-none text-sm bg-transparent placeholder:text-gray-400 text-gray-700"
                 />
                 <button

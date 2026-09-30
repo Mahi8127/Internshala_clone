@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface MessageNotificationProps {
   senderName: string;
@@ -16,6 +17,8 @@ const MessageNotification = ({
   onClick,
   onClose,
 }: MessageNotificationProps) => {
+  const { t } = useLanguage();
+
   // Automatically close after 5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -138,7 +141,7 @@ const MessageNotification = ({
             hover:bg-gray-100
             transition
           "
-          aria-label="Close notification"
+          aria-label={t("publicSpace.chat.closeNotification")}
         >
           <X size={17} />
         </button>
@@ -148,3 +151,4 @@ const MessageNotification = ({
 };
 
 export default MessageNotification;
+

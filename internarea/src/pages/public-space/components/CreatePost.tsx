@@ -5,12 +5,14 @@ import React, { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Image, Send, X } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface CreatePostProps {
   onPostCreated: () => void;
 }
 
 const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
+  const { t } = useLanguage();
   const user = useSelector(selectuser);
   const currentUserId = user?._id || user?.id || "";
 
@@ -34,7 +36,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
       !file.type.startsWith("image/") &&
       !file.type.startsWith("video/")
     ) {
-      toast.error("Please select an image or video");
+      toast.error(t("publicSpace.createPost.selectMedia"));
       return;
     }
 
@@ -55,12 +57,12 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
 
   const handleCreatePost = async () => {
     if (!currentUserId) {
-      toast.error("Please login first.");
+      toast.error(t("publicSpace.loginFirst"));
       return;
     }
 
     if (!selectedFile) {
-      toast.error("Please select an image or video.");
+      toast.error(t("publicSpace.createPost.selectMedia"));
       return;
     }
 
@@ -87,11 +89,11 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
 
       if (!response.ok) {
         // Show the actual backend message.
-        toast.error(data.message || "Failed to create post.");
+        toast.error(data.message || t("publicSpace.createPost.failedCreate"));
         return;
       }
 
-      toast.success("Post created successfully");
+      toast.success(t("publicSpace.createPost.postCreated"));
 
       setCaption("");
       removeFile();
@@ -101,7 +103,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
       console.error("Create post error:", error);
 
       toast.error(
-        error?.message || "Unable to connect to the server."
+        error?.message || t("publicSpace.createPost.unableToConnect")
       );
     } finally {
       setLoading(false);
@@ -111,18 +113,18 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
   return (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
       <h2 className="text-lg font-semibold text-gray-900">
-        Create a Post
+        {t("publicSpace.createPost.title")}
       </h2>
 
       <p className="text-sm text-gray-500 mt-1 mb-5">
-        Share something with the community.
+        {t("publicSpace.createPost.subtitle")}
       </p>
 
       {/* Caption */}
       <textarea
         value={caption}
         onChange={(e) => setCaption(e.target.value)}
-        placeholder="what's on your mind?"
+        placeholder={t("publicSpace.createPost.placeholder")}
         rows={4}
         className="w-full resize-none rounded-xl border border-gray-500 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 placeholder:text-gray-500 text-gray-700"
       />
@@ -135,7 +137,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
         >
           <Image size={18} />
-          Photo / Video
+          {t("publicSpace.createPost.photoVideo")}
         </button>
 
         <input
@@ -167,7 +169,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
           ) : (
             <img
               src={previewUrl}
-              alt="Preview"
+              alt={t("publicSpace.createPost.previewAlt")}
               className="w-full max-h-72 object-contain"
             />
           )}
@@ -190,7 +192,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
       >
         <Send size={18} />
 
-        {loading ? "Posting..." : "Post"}
+        {loading ? t("publicSpace.createPost.posting") : t("publicSpace.createPost.post")}
       </button>
     </div>
   );
