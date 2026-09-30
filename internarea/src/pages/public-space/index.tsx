@@ -17,16 +17,16 @@ import {
 
 import toast from "react-hot-toast";
 
-import Chat from "./components/Chat/Chat";
+import Chat from "../../Components/PublicSpace/Chat/Chat";
 import { useLanguage } from "@/context/LanguageContext";
 
 import {
   selectuser,
 } from "@/Feature/Userslice";
 
-import CreatePost from "./components/CreatePost";
-import PostCard from "./components/PostCard";
-import ShareModal from "./components/ShareModal";
+import CreatePost from "../../Components/PublicSpace/CreatePost";
+import PostCard from "../../Components/PublicSpace/PostCard";
+import ShareModal from "../../Components/PublicSpace/ShareModal";
 
 const API_URL =
   "http://internshala-backend-5ycp.onrender.com/";

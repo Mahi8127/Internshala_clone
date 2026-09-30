@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { pdf } from "@react-pdf/renderer";
-import ResumeDocument from "../pdf/ResumeDocument";
+import ResumeDocument from "../../Components/Resume/ResumeDocument";
 import toast from "react-hot-toast";
 import {
   Award,

@@ -75,11 +75,10 @@ const MessageBubble = ({
   // ==========================================
 
   const senderId =
-    typeof message.sender ===
-    "string"
-      ? message.sender
-      : message.sender?._id ||
-        message.sender?.id;
+  typeof message?.sender === "string"
+    ? message.sender
+    : message?.sender?._id ||
+      message?.sender?.id;
 
   const isMine =
     String(senderId) ===
