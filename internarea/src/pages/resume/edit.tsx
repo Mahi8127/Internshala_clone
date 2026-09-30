@@ -177,7 +177,7 @@ const Resume = () => {
         setLoading(true);
 
         const res = await axios.get(
-          `http://localhost:5000/api/resume/${user.id}`
+          `http://internshala-backend-5ycp.onrender.com//api/resume/${user.id}`
         );
 
         const resume = res.data.resume;
@@ -466,7 +466,7 @@ const Resume = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:5000/api/resume/${resumeId}`,
+        `http://internshala-backend-5ycp.onrender.com//api/resume/${resumeId}`,
         data,
         {
           headers: {
@@ -492,7 +492,7 @@ const Resume = () => {
   const existingPhoto = useMemo(() => {
     if (!formData.photo) return "";
 
-    return `http://localhost:5000/uploads/profilePhoto/${formData.photo}`;
+    return `http://internshala-backend-5ycp.onrender.com//uploads/profilePhoto/${formData.photo}`;
   }, [formData.photo]);
 
   // --------------------------------------------------

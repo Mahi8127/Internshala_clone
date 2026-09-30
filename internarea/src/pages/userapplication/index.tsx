@@ -82,7 +82,7 @@ const UserApplication = () => {
     const fetchdata = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("http://localhost:5000/api/application");
+        const res = await axios.get("http://internshala-backend-5ycp.onrender.com//api/application");
         setData(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.log(error);

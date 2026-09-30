@@ -39,7 +39,7 @@ const LanguageOtpModal = ({
       }
 
       const response = await fetch(
-        "http://localhost:5000/api/language/verify-otp",
+        "http://internshala-backend-5ycp.onrender.com//api/language/verify-otp",
         {
           method: "POST",
           headers: {
@@ -97,7 +97,7 @@ const LanguageOtpModal = ({
       }
 
       const response = await fetch(
-        "http://localhost:5000/api/language/send-otp",
+        "http://internshala-backend-5ycp.onrender.com//api/language/send-otp",
         {
           method: "POST",
           headers: {

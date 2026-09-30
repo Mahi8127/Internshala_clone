@@ -327,7 +327,7 @@ const Resume = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:5000/api/resume",
+        "http://internshala-backend-5ycp.onrender.com//api/resume",
         data,
         {
           headers: {

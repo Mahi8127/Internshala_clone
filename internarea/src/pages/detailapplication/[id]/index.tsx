@@ -88,7 +88,7 @@ const DetailApplication = () => {
         setLoading(true);
 
         const res = await axios.get(
-          `http://localhost:5000/api/application/${id}`
+          `http://internshala-backend-5ycp.onrender.com//api/application/${id}`
         );
 
         setData(res.data);
@@ -379,7 +379,7 @@ const DetailApplication = () => {
                   </div>
 
                   <a
-                    href={`http://localhost:5000/uploads/resume/${data.resume.resumeUrl}`}
+                    href={`http://internshala-backend-5ycp.onrender.com//uploads/resume/${data.resume.resumeUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 sm:w-auto"

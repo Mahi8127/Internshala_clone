@@ -101,7 +101,7 @@ const Applications = () => {
         setLoading(true);
 
         const res = await axios.get(
-          "http://localhost:5000/api/application"
+          "http://internshala-backend-5ycp.onrender.com//api/application"
         );
 
         setData(Array.isArray(res.data) ? res.data : []);
@@ -174,7 +174,7 @@ const Applications = () => {
       setUpdatingId(id);
 
       const res = await axios.put(
-        `http://localhost:5000/api/application/${id}`,
+        `http://internshala-backend-5ycp.onrender.com//api/application/${id}`,
         { action }
       );
 

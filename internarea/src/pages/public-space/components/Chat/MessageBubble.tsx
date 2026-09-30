@@ -3,7 +3,7 @@
 import React from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "http://internshala-backend-5ycp.onrender.com/";
 
 interface SharedPost {
   _id?: string;

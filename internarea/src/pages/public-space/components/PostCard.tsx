@@ -81,7 +81,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const mediaUrl = rawMediaUrl
     ? String(rawMediaUrl).startsWith("http")
       ? String(rawMediaUrl)
-      : `http://localhost:5000/uploads/public/${String(rawMediaUrl).replace(
+      : `http://internshala-backend-5ycp.onrender.com//uploads/public/${String(rawMediaUrl).replace(
           /^\/+/,
           "",
         )}`

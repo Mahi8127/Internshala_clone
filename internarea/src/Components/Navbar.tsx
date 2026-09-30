@@ -215,7 +215,7 @@ const Navbar = () => {
       setSendingLanguageOtp(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/language/send-otp",
+        "http://internshala-backend-5ycp.onrender.com//api/language/send-otp",
         {
           method: "POST",
           headers: {

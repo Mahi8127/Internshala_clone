@@ -69,7 +69,7 @@ const Index = () => {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/api/register",
+        "http://internshala-backend-5ycp.onrender.com//api/register",
         {
           name: formData.name,
           email: formData.email,

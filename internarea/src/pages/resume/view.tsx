@@ -53,7 +53,7 @@ const ViewResume = () => {
 
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/resume/${user.id}`
+          `http://internshala-backend-5ycp.onrender.com//api/resume/${user.id}`
         );
 
         setResume(res.data.resume);
@@ -86,7 +86,7 @@ const ViewResume = () => {
 
       if (resume.photo) {
         const response = await fetch(
-          `http://localhost:5000/uploads/profilePhoto/${resume.photo}`
+          `http://internshala-backend-5ycp.onrender.com//uploads/profilePhoto/${resume.photo}`
         );
 
         const blob = await response.blob();
@@ -121,7 +121,7 @@ const ViewResume = () => {
       formData.append("userId", user.id);
 
       await axios.post(
-        "http://localhost:5000/api/resume/upload-pdf",
+        "http://internshala-backend-5ycp.onrender.com//api/resume/upload-pdf",
         formData,
         {
           headers: {
@@ -166,7 +166,7 @@ const ViewResume = () => {
       setPaymentLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/payment/send-otp",
+        "http://internshala-backend-5ycp.onrender.com//api/payment/send-otp",
         {
           userId: user.id,
         }
@@ -197,7 +197,7 @@ const ViewResume = () => {
       setPaymentLoading(true);
 
       const verifyOtp = await axios.post(
-        "http://localhost:5000/api/payment/verify-otp",
+        "http://internshala-backend-5ycp.onrender.com//api/payment/verify-otp",
         {
           email: paymentEmail,
           otp: otp.join(""),
@@ -212,7 +212,7 @@ const ViewResume = () => {
       setShowOtpModel(false);
 
       const { data } = await axios.post(
-        "http://localhost:5000/api/payment/create-order",
+        "http://internshala-backend-5ycp.onrender.com//api/payment/create-order",
         {
           userId: user.id,
         }
@@ -229,7 +229,7 @@ const ViewResume = () => {
         handler: async function (response: any) {
           try {
             const verify = await axios.post(
-              "http://localhost:5000/api/payment/verify-payment",
+              "http://internshala-backend-5ycp.onrender.com//api/payment/verify-payment",
               {
                 ...response,
                 userId: user.id,
@@ -240,7 +240,7 @@ const ViewResume = () => {
               toast.success("Payment Successful!");
 
               const res = await axios.get(
-                `http://localhost:5000/api/resume/${user.id}`
+                `http://internshala-backend-5ycp.onrender.com//api/resume/${user.id}`
               );
 
               setResume(res.data.resume);
@@ -392,7 +392,7 @@ const ViewResume = () => {
             <div className="flex flex-col items-center mb-8">
               {resume.photo ? (
                 <img
-                  src={`http://localhost:5000/uploads/profilePhoto/${resume.photo}`}
+                  src={`http://internshala-backend-5ycp.onrender.com//uploads/profilePhoto/${resume.photo}`}
                   alt="Profile"
                   className="w-28 h-28 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-white shadow-xl"
                 />
