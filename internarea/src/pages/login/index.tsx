@@ -49,7 +49,7 @@ const Index = () => {
           identifier,
           password,
         },
-        { timeout: 25000 }
+        { timeout: 60000 }
       );
 
       if (response.data.otpRequired) {
@@ -76,7 +76,7 @@ const Index = () => {
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          toast.error("Request timed out. The server is waking up, please try again in a moment.");
+          toast.error("Request timed out. The server is taking longer than usual to respond. Please try again.");
         } else {
           toast.error(
             error.response?.data?.message || t("auth.login.loginFailed")
@@ -100,7 +100,7 @@ const Index = () => {
         {
           email,
         },
-        { timeout: 20000 }
+        { timeout: 45000 }
       );
 
       toast.success(response.data.message);
