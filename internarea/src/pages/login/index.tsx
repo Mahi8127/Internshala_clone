@@ -16,6 +16,10 @@ const Index = () => {
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -44,7 +48,8 @@ const Index = () => {
         {
           identifier,
           password,
-        }
+        },
+        { timeout: 25000 }
       );
 
       if (response.data.otpRequired) {
@@ -70,9 +75,13 @@ const Index = () => {
       router.push("/");
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message || t("auth.login.loginFailed")
-        );
+        if (error.code === "ECONNABORTED") {
+          toast.error("Request timed out. The server is waking up, please try again in a moment.");
+        } else {
+          toast.error(
+            error.response?.data?.message || t("auth.login.loginFailed")
+          );
+        }
       } else {
         toast.error(t("auth.login.somethingWrong"));
       }
@@ -85,11 +94,13 @@ const Index = () => {
 
   const handleResendOtp = async () => {
     try {
+      setResendLoading(true);
       const response = await axios.post(
         "https://internshala-backend-5ycp.onrender.com/api/resend-login-otp",
         {
           email,
-        }
+        },
+        { timeout: 20000 }
       );
 
       toast.success(response.data.message);
@@ -102,6 +113,8 @@ const Index = () => {
         error.response?.data?.message ||
           t("auth.login.otpRequired.resendFailed")
       );
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -109,6 +122,7 @@ const Index = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      setGoogleLoading(true);
       const result = await signInWithPopup(auth, provider);
 
       const googleUser = {
@@ -119,9 +133,11 @@ const Index = () => {
 
       const response = await axios.post(
         "https://internshala-backend-5ycp.onrender.com/api/google-login",
-        googleUser
+        googleUser,
+        { timeout: 20000 }
       );
 
+      localStorage.setItem("token", response.data.token);
       localStorage.setItem(
         "user",
         JSON.stringify(response.data.user)
@@ -132,9 +148,19 @@ const Index = () => {
       toast.success(t("auth.login.loginSuccess"));
 
       router.push("/");
-    } catch (error) {
-      console.error(error);
-      toast.error(t("auth.login.loginFailed"));
+    } catch (error: any) {
+      console.error("[AUTH] Google Sign-in Error:", error);
+      if (error.code === "auth/unauthorized-domain") {
+        toast.error("This domain is not authorized in Firebase Authentication settings. Please contact the administrator.");
+      } else if (error.code === "auth/popup-closed-by-user") {
+        toast.error("Google sign-in popup was closed.");
+      } else if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || t("auth.login.loginFailed"));
+      } else {
+        toast.error(t("auth.login.loginFailed"));
+      }
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -196,12 +222,14 @@ const Index = () => {
     }
 
     try {
+      setVerifyLoading(true);
       const response = await axios.post(
         "https://internshala-backend-5ycp.onrender.com/api/verify-login-otp",
         {
           email,
           otp: otp.join(""),
-        }
+        },
+        { timeout: 20000 }
       );
 
       localStorage.setItem(
@@ -224,6 +252,8 @@ const Index = () => {
         error.response?.data?.message ||
           t("auth.login.otpRequired.otpFailed")
       );
+    } finally {
+      setVerifyLoading(false);
     }
   };
 
@@ -459,6 +489,7 @@ const Index = () => {
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
+                  disabled={googleLoading || loading}
                   className="
                     flex w-full
                     items-center justify-center gap-3
@@ -470,6 +501,8 @@ const Index = () => {
                     transition-all duration-200
                     hover:bg-slate-50
                     hover:shadow-sm
+                    disabled:cursor-not-allowed
+                    disabled:opacity-60
                   "
                 >
 
@@ -498,7 +531,7 @@ const Index = () => {
                     />
                   </svg>
 
-                  {t("auth.login.continueWithGoogle")}
+                  {googleLoading ? "Signing in..." : t("auth.login.continueWithGoogle")}
 
                 </button>
 
@@ -617,6 +650,7 @@ const Index = () => {
 
                   <button
                     type="submit"
+                    disabled={verifyLoading}
                     className="
                       flex w-full
                       items-center justify-center gap-2
@@ -628,10 +662,12 @@ const Index = () => {
                       transition
                       hover:bg-blue-700
                       hover:shadow-md
+                      disabled:cursor-not-allowed
+                      disabled:opacity-60
                     "
                   >
-                    {t("auth.login.otpRequired.verifyBtn")}
-                    <ArrowRight size={17} />
+                    {verifyLoading ? "Verifying OTP..." : t("auth.login.otpRequired.verifyBtn")}
+                    {!verifyLoading && <ArrowRight size={17} />}
                   </button>
 
                   {/* Resend */}
@@ -639,6 +675,7 @@ const Index = () => {
                   <button
                     type="button"
                     onClick={handleResendOtp}
+                    disabled={resendLoading || verifyLoading}
                     className="
                       w-full rounded-xl
                       border border-gray-200
@@ -648,9 +685,11 @@ const Index = () => {
                       text-slate-700
                       transition
                       hover:bg-slate-50
+                      disabled:cursor-not-allowed
+                      disabled:opacity-60
                     "
                   >
-                    {t("auth.login.otpRequired.resendBtn")}
+                    {resendLoading ? "Resending OTP..." : t("auth.login.otpRequired.resendBtn")}
                   </button>
 
                   {/* Back */}
@@ -661,12 +700,15 @@ const Index = () => {
                       setOtpRequired(false);
                       setOtp(["", "", "", "", "", ""]);
                     }}
+                    disabled={verifyLoading}
                     className="
                       w-full
                       text-sm font-medium
                       text-slate-500
                       transition
                       hover:text-blue-600
+                      disabled:cursor-not-allowed
+                      disabled:opacity-60
                     "
                   >
                     {t("auth.login.otpRequired.backBtn")}

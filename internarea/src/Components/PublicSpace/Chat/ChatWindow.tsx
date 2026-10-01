@@ -4,7 +4,7 @@ import { ArrowLeft, MessageCircle, MoreVertical, Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import MessageBubble from "./MessageBubble";
 
-const API_URL = "http://localhosst:5000";
+const API_URL = "https://internshala-backend-5ycp.onrender.com";
 
 interface User {
   _id: string;
