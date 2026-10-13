@@ -23,9 +23,9 @@ const getTransporter = () => {
         user: user.trim(),
         pass: cleanPass,
       },
-      connectionTimeout: 10000, // 10 seconds
-      greetingTimeout: 10000,   // 10 seconds
-      socketTimeout: 15000,     // 15 seconds
+      connectionTimeout: 4000, // 4 seconds
+      greetingTimeout: 4000,   // 4 seconds
+      socketTimeout: 6000,     // 6 seconds
     });
   }
   return transporter;
