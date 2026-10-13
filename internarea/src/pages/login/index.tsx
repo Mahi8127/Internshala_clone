@@ -72,7 +72,11 @@ const Index = () => {
       setIdentifier("");
       setPassword("");
 
-      router.push("/");
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
@@ -126,9 +130,9 @@ const Index = () => {
       const result = await signInWithPopup(auth, provider);
 
       const googleUser = {
-        name: result.user.displayName,
+        name: result.user.displayName || "Google User",
         email: result.user.email,
-        photo: result.user.photoURL,
+        photo: result.user.photoURL || "",
       };
 
       const response = await axios.post(
@@ -147,7 +151,11 @@ const Index = () => {
 
       toast.success(t("auth.login.loginSuccess"));
 
-      router.push("/");
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       console.error("[AUTH] Google Sign-in Error:", error);
       if (error.code === "auth/unauthorized-domain") {
@@ -246,7 +254,11 @@ const Index = () => {
 
       toast.success(response.data.message);
 
-      router.push("/");
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       toast.error(
         error.response?.data?.message ||
