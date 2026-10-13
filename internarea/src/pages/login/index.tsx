@@ -55,13 +55,7 @@ const Index = () => {
       if (response.data.otpRequired) {
         setOtpRequired(true);
         setEmail(response.data.email);
-        toast.success(response.data.message);
-        if (response.data.debugOtp) {
-          toast(`Your OTP is: ${response.data.debugOtp}`, {
-            duration: 15000,
-            icon: "🔑",
-          });
-        }
+        toast.success(response.data.message || t("auth.login.otpRequired.title"));
         return;
       }
 
@@ -114,12 +108,6 @@ const Index = () => {
       );
 
       toast.success(response.data.message);
-      if (response.data.debugOtp) {
-        toast(`Your OTP is: ${response.data.debugOtp}`, {
-          duration: 15000,
-          icon: "🔑",
-        });
-      }
 
       setOtp(["", "", "", "", "", ""]);
 
