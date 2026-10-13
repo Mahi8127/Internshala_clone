@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test-email-fix.js",
+    "test": "node test-cors.js && node test-email-fix.js",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "build": "echo \"No build step required for Node.js backend\""
