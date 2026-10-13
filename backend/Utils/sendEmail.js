@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const axios = require("axios");
 require("dotenv").config();
 
 let transporter = null;
@@ -24,52 +23,15 @@ const getTransporter = () => {
         user: user.trim(),
         pass: cleanPass,
       },
-      connectionTimeout: 5000, // 5 seconds
-      greetingTimeout: 5000,   // 5 seconds
-      socketTimeout: 8000,     // 8 seconds
+      connectionTimeout: 4000, // 4 seconds
+      greetingTimeout: 4000,   // 4 seconds
+      socketTimeout: 6000,     // 6 seconds
     });
   }
   return transporter;
 };
 
-/**
- * Send email using Resend HTTPS API (Port 443) if RESEND_API_KEY is configured,
- * or fallback to Gmail SMTP via Nodemailer.
- * Never logs credentials, API keys, or email passwords.
- */
 const sendEmail = async (to, subject, text, attachments = []) => {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  // 1. Resend HTTPS API (Works reliably on cloud hosts with blocked SMTP ports)
-  if (resendApiKey) {
-    const fromAddress = process.env.RESEND_FROM || process.env.EMAIL_FROM || "onboarding@resend.dev";
-    try {
-      const response = await axios.post(
-        "https://api.resend.com/emails",
-        {
-          from: fromAddress,
-          to: Array.isArray(to) ? to : [to],
-          subject,
-          text,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${resendApiKey.trim()}`,
-            "Content-Type": "application/json",
-          },
-          timeout: 10000,
-        }
-      );
-      console.log(`[EMAIL SUCCESS via Resend API] Message dispatched successfully (Id: ${response.data?.id || "N/A"})`);
-      return { success: true, messageId: response.data?.id };
-    } catch (apiError) {
-      const errMsg = apiError.response?.data?.message || apiError.message;
-      console.error(`[EMAIL DISPATCH ERROR via Resend API] Status: ${apiError.response?.status || "N/A"}, Message: ${errMsg}`);
-      throw new Error(`Email delivery failed via API: ${errMsg}`);
-    }
-  }
-
-  // 2. Fallback to SMTP (for local environment or environments where SMTP ports 465/587 are open)
   const mailTransporter = getTransporter();
   const fromAddress = process.env.EMAIL || process.env.EMAIL_USER;
 
