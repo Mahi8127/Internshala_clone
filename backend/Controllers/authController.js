@@ -143,21 +143,19 @@ const loginUser = async (req, res) => {
           `Your login OTP is ${otp}. It is valid for 5 minutes.`,
         );
       } catch (emailError) {
+        delete loginOtpStore[user.email];
         console.error(
-          "[AUTH] Email sending failed during login (SMTP port blocked on host):",
+          "[AUTH] Email delivery failed during login:",
           emailError.message
         );
-        return res.status(200).json({
-          otpRequired: true,
-          message: "OTP sent (SMTP blocked on host, OTP provided in response).",
-          email: user.email,
-          debugOtp: otp,
+        return res.status(500).json({
+          message: "Unable to send OTP. Please try again later.",
         });
       }
 
       return res.status(200).json({
         otpRequired: true,
-        message: "OTP sent to your registered email.",
+        message: "OTP sent to your registered email address.",
         email: user.email,
       });
     }
@@ -415,9 +413,9 @@ Regards,
 Internship Portal Team`,
       );
     } catch (emailErr) {
-      console.error("[AUTH] Forgot password email failed (SMTP blocked):", emailErr.message);
-      return res.status(200).json({
-        message: `Password reset successfully. Your new password is: ${newPassword}`,
+      console.error("[AUTH] Forgot password email delivery failed:", emailErr.message);
+      return res.status(500).json({
+        message: "Unable to send password reset email. Please try again later.",
       });
     }
 
@@ -510,15 +508,15 @@ const resendLoginOtp = async (req, res) => {
         `Your new login OTP is ${otp}. It is valid for 5 minutes.`,
       );
     } catch (emailErr) {
-      console.error("[AUTH] Resend OTP email failed (SMTP blocked):", emailErr.message);
-      return res.status(200).json({
-        message: "OTP resent (SMTP blocked on host, OTP provided in response).",
-        debugOtp: otp,
+      delete loginOtpStore[email];
+      console.error("[AUTH] Resend OTP email delivery failed:", emailErr.message);
+      return res.status(500).json({
+        message: "Unable to send OTP. Please try again later.",
       });
     }
 
     return res.status(200).json({
-      message: "OTP resent successfully",
+      message: "OTP sent to your registered email address.",
     });
   } catch (error) {
     console.error("[AUTH] Resend OTP error:", error.message);

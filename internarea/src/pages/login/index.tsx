@@ -55,13 +55,9 @@ const Index = () => {
       if (response.data.otpRequired) {
         setOtpRequired(true);
         setEmail(response.data.email);
-        toast.success(response.data.message);
-        if (response.data.debugOtp) {
-          toast(`Your OTP is: ${response.data.debugOtp}`, {
-            duration: 15000,
-            icon: "🔑",
-          });
-        }
+        toast.success(
+          response.data.message || "OTP sent to your registered email address."
+        );
         return;
       }
 
@@ -113,13 +109,9 @@ const Index = () => {
         { timeout: 45000 }
       );
 
-      toast.success(response.data.message);
-      if (response.data.debugOtp) {
-        toast(`Your OTP is: ${response.data.debugOtp}`, {
-          duration: 15000,
-          icon: "🔑",
-        });
-      }
+      toast.success(
+        response.data.message || "OTP sent to your registered email address."
+      );
 
       setOtp(["", "", "", "", "", ""]);
 
