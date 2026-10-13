@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import axios from "axios";
 import { useLanguage } from "@/context/LanguageContext";
+import { API_URL } from "@/config/api";
 
 export default function SvgSlider() {
   const { t } = useLanguage();
@@ -71,8 +72,8 @@ export default function SvgSlider() {
     const fetchdata = async () => {
       try {
         const [internshipres, jobres] = await Promise.all([
-          axios.get("https://internshala-backend-5ycp.onrender.com/api/internship"),
-          axios.get("https://internshala-backend-5ycp.onrender.com/api/job"),
+          axios.get(`${API_URL}/internship`),
+          axios.get(`${API_URL}/job`),
         ]);
 
         setinternship(internshipres.data);

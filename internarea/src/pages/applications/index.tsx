@@ -1,5 +1,6 @@
 import { useLanguage } from "@/context/LanguageContext";
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import {
   Building2,
   Calendar,
@@ -100,9 +101,7 @@ const Applications = () => {
       try {
         setLoading(true);
 
-        const res = await axios.get(
-          "https://internshala-backend-5ycp.onrender.com/api/application"
-        );
+        const res = await axios.get(`${API_URL}/application`);
 
         setData(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
@@ -174,7 +173,7 @@ const Applications = () => {
       setUpdatingId(id);
 
       const res = await axios.put(
-        `https://internshala-backend-5ycp.onrender.com/api/application/${id}`,
+        `${API_URL}/application/${id}`,
         { action }
       );
 

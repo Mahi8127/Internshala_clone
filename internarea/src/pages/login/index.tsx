@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import { login } from "@/Feature/Userslice";
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import { Mail, Lock, EyeOff, Eye, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -44,7 +45,7 @@ const Index = () => {
       setLoading(true);
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/login",
+        `${API_URL}/login`,
         {
           identifier,
           password,
@@ -102,7 +103,7 @@ const Index = () => {
     try {
       setResendLoading(true);
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/resend-login-otp",
+        `${API_URL}/resend-login-otp`,
         {
           email,
         },
@@ -140,7 +141,7 @@ const Index = () => {
       };
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/google-login",
+        `${API_URL}/google-login`,
         googleUser,
         { timeout: 20000 }
       );
@@ -236,7 +237,7 @@ const Index = () => {
     try {
       setVerifyLoading(true);
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/verify-login-otp",
+        `${API_URL}/verify-login-otp`,
         {
           email,
           otp: otp.join(""),

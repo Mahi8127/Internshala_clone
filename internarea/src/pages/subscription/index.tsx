@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_URL, RAZORPAY_KEY_ID } from "@/config/api";
 import { useSelector } from "react-redux";
 import { selectuser } from "@/Feature/Userslice";
 import {
@@ -88,7 +89,7 @@ const SubscriptionPage = () => {
 
     try {
       const response = await axios.get(
-        `https://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
+        `${API_URL}/payment/subscription/${user.id}`
       );
 
       if (response.data.success) {
@@ -182,7 +183,7 @@ const SubscriptionPage = () => {
          --------------------------------------------- */
 
       const orderResponse = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/payment/subscription/create-order",
+        `${API_URL}/payment/subscription/create-order`,
         {
           userId: user.id,
           plan: planId,
@@ -206,7 +207,7 @@ const SubscriptionPage = () => {
          --------------------------------------------- */
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: RAZORPAY_KEY_ID,
 
         amount: order.amount,
 
@@ -246,7 +247,7 @@ const SubscriptionPage = () => {
                ----------------------------------------- */
 
             const verifyResponse = await axios.post(
-              "https://internshala-backend-5ycp.onrender.com/api/payment/subscription/verify-payment",
+              `${API_URL}/payment/subscription/verify-payment`,
               {
                 razorpay_order_id:
                   response.razorpay_order_id,

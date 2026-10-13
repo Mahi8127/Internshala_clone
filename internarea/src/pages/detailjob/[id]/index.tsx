@@ -1,5 +1,6 @@
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
+import { API_URL, BACKEND_URL } from "@/config/api";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -98,7 +99,7 @@ const index = () => {
     const fetchdata = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/job/${id}`
+          `${API_URL}/job/${id}`
         );
 
         setjob(res.data);
@@ -120,7 +121,7 @@ const index = () => {
     const fetchResume = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `${API_URL}/resume/${user.id}`
         );
 
         setResume(res.data.resume);
@@ -147,7 +148,7 @@ const index = () => {
     const fetchSubscription = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
+          `${API_URL}/payment/subscription/${user.id}`
         );
 
         if (res.data.success) {
@@ -242,7 +243,7 @@ const index = () => {
       };
 
       await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/application",
+        `${API_URL}/application`,
         applicationdata
       );
 
@@ -282,7 +283,7 @@ const index = () => {
         // Refresh subscription
         try {
           const res = await axios.get(
-            `https://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
+            `${API_URL}/payment/subscription/${user.id}`
           );
 
           if (res.data.success) {
@@ -670,7 +671,7 @@ const index = () => {
                         </div>
 
                         <a
-                          href={`https://internshala-backend-5ycp.onrender.com/uploads/resume/${resume.resumeUrl}`}
+                          href={`${BACKEND_URL}/uploads/resume/${resume.resumeUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"

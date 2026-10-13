@@ -2,7 +2,7 @@
 import { MessageCircle, Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-const API_URL = "https://internshala-backend-5ycp.onrender.com/";
+import { BACKEND_URL as API_URL } from "@/config/api";
 
 interface User {
   _id: string;

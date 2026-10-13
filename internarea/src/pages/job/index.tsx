@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import {
   ArrowUpRight,
   DollarSign,
@@ -37,9 +38,7 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "https://internshala-backend-5ycp.onrender.com/api/job"
-        );
+        const res = await axios.get(`${API_URL}/job`);
 
         setJobData(res.data);
         setFilteredJobs(res.data);

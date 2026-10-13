@@ -1,5 +1,6 @@
 import { useLanguage } from "@/context/LanguageContext";
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import { User, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -37,7 +38,7 @@ const AdminLogin = () => {
     try {
       setisloading(true);
 
-      await axios.post("https://internshala-backend-5ycp.onrender.com/api/admin/adminlogin", formdata);
+      await axios.post(`${API_URL}/admin/adminlogin`, formdata);
 
       toast.success(t("adminlogin.loginSuccess"));
 

@@ -1,5 +1,6 @@
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
+import { API_URL, BACKEND_URL } from "@/config/api";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -55,7 +56,7 @@ const DetailInternship = () => {
     const fetchInternship = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/internship/${id}`
+          `${API_URL}/internship/${id}`
         );
 
         setInternship(res.data);
@@ -78,7 +79,7 @@ const DetailInternship = () => {
     const fetchResume = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `${API_URL}/resume/${user.id}`
         );
 
         setResume(res.data.resume);
@@ -103,7 +104,7 @@ const DetailInternship = () => {
     const fetchSubscription = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
+          `${API_URL}/payment/subscription/${user.id}`
         );
 
         if (res.data.success) {
@@ -201,7 +202,7 @@ const DetailInternship = () => {
       };
 
       await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/application",
+        `${API_URL}/application`,
         applicationData
       );
 
@@ -233,7 +234,7 @@ const DetailInternship = () => {
 
         try {
           const res = await axios.get(
-            `https://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
+            `${API_URL}/payment/subscription/${user.id}`
           );
 
           if (res.data.success) {
@@ -635,7 +636,7 @@ const DetailInternship = () => {
                           </div>
 
                           <a
-                            href={`https://internshala-backend-5ycp.onrender.com/uploads/resume/${resume.resumeUrl}`}
+                            href={`${BACKEND_URL}/uploads/resume/${resume.resumeUrl}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex min-h-10 items-center justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-blue-600 shadow-sm transition hover:bg-blue-50"

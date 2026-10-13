@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, Mail, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { API_URL } from "@/config/api";
 
 interface LanguageOtpModalProps {
   onClose: () => void;
@@ -39,7 +40,7 @@ const LanguageOtpModal = ({
       }
 
       const response = await fetch(
-        "https://internshala-backend-5ycp.onrender.com/api/language/verify-otp",
+        `${API_URL}/language/verify-otp`,
         {
           method: "POST",
           headers: {
@@ -97,7 +98,7 @@ const LanguageOtpModal = ({
       }
 
       const response = await fetch(
-        "https://internshala-backend-5ycp.onrender.com/api/language/send-otp",
+        `${API_URL}/language/send-otp`,
         {
           method: "POST",
           headers: {

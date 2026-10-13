@@ -7,6 +7,7 @@ import React, {
   FormEvent,
 } from "react";
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
@@ -327,7 +328,7 @@ const Resume = () => {
       }
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/resume",
+        `${API_URL}/resume`,
         data,
         {
           headers: {

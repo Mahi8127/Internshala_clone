@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import {
   Briefcase,
   Building2,
@@ -62,7 +63,7 @@ const index = () => {
       setisloading(true);
 
       await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/internship",
+        `${API_URL}/internship`,
         formData
       );
 

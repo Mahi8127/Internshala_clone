@@ -16,7 +16,7 @@ import {
 import MessageBubble from "./MessageBubble";
 import { useLanguage } from "@/context/LanguageContext";
 
-const API_URL = "https://internshala-backend-5ycp.onrender.com/";
+import { BACKEND_URL as API_URL } from "@/config/api";
 
 interface ChatProps {
   currentUserId: string;

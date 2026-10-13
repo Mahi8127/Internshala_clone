@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import {
   Mail,
   Phone,
@@ -69,7 +70,7 @@ const Index = () => {
       setLoading(true);
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/register",
+        `${API_URL}/register`,
         {
           name: formData.name,
           email: formData.email,

@@ -2,6 +2,7 @@
 
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import {
   ArrowRight,
   ExternalLink,
@@ -30,7 +31,7 @@ const Index = () => {
 
       try {
         const response = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `${API_URL}/resume/${user.id}`
         );
 
         setResume(response.data.resume);

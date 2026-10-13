@@ -2,6 +2,7 @@
 
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import {
   ArrowLeft,
   Clock,
@@ -30,7 +31,7 @@ const Index = () => {
 
       try {
         const response = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/login-history/${user.id}`
+          `${API_URL}/login-history/${user.id}`
         );
 
         setHistory(response.data.history || []);

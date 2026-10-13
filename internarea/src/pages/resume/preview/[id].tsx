@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { pdf } from "@react-pdf/renderer";
+import { API_URL } from "@/config/api";
 
 export default function ResumePreview() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function ResumePreview() {
 
     const fetchResume = async () => {
       try {
-        const res = await axios.get(`https://internshala-backend-5ycp.onrender.com/api/resume/${id}`);
+        const res = await axios.get(`${API_URL}/resume/${id}`);
 
         setResume(res.data.resume);
       } catch (error) {

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Image, Send, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { API_URL } from "@/config/api";
 
 interface CreatePostProps {
   onPostCreated: () => void;
@@ -76,7 +77,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
       formData.append("media", selectedFile);
 
       const response = await fetch(
-        "https://internshala-backend-5ycp.onrender.com/api/posts/create",
+        `${API_URL}/posts/create`,
         {
           method: "POST",
           body: formData,

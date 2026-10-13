@@ -28,8 +28,7 @@ import CreatePost from "../../Components/PublicSpace/CreatePost";
 import PostCard from "../../Components/PublicSpace/PostCard";
 import ShareModal from "../../Components/PublicSpace/ShareModal";
 
-const API_URL =
-  "https://internshala-backend-5ycp.onrender.com";
+import { BACKEND_URL as API_URL } from "@/config/api";
 
 const PublicSpace = () => {
   const { t } = useLanguage();

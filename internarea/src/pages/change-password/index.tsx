@@ -2,6 +2,7 @@
 
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
+import { API_URL } from "@/config/api";
 import {
   ArrowLeft,
   Eye,
@@ -53,7 +54,7 @@ const ChangePassword = () => {
       setLoading(true);
 
       const response = await axios.put(
-        "https://internshala-backend-5ycp.onrender.com/api/change-password",
+        `${API_URL}/change-password`,
         {
           userId: user.id,
           currentPassword,

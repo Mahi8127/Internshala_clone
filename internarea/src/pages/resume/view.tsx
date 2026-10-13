@@ -2,6 +2,7 @@
 
 import { selectuser } from "@/Feature/Userslice";
 import axios from "axios";
+import { API_URL, BACKEND_URL, RAZORPAY_KEY_ID } from "@/config/api";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
@@ -53,7 +54,7 @@ const ViewResume = () => {
 
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `${API_URL}/resume/${user.id}`
         );
 
         setResume(res.data.resume);
@@ -86,7 +87,7 @@ const ViewResume = () => {
 
       if (resume.photo) {
         const response = await fetch(
-          `https://internshala-backend-5ycp.onrender.com/uploads/profilePhoto/${resume.photo}`
+          `${BACKEND_URL}/uploads/profilePhoto/${resume.photo}`
         );
 
         const blob = await response.blob();
@@ -121,7 +122,7 @@ const ViewResume = () => {
       formData.append("userId", user.id);
 
       await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/resume/upload-pdf",
+        `${API_URL}/resume/upload-pdf`,
         formData,
         {
           headers: {
@@ -166,7 +167,7 @@ const ViewResume = () => {
       setPaymentLoading(true);
 
       const res = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/payment/send-otp",
+        `${API_URL}/payment/send-otp`,
         {
           userId: user.id,
         }
@@ -197,7 +198,7 @@ const ViewResume = () => {
       setPaymentLoading(true);
 
       const verifyOtp = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/payment/verify-otp",
+        `${API_URL}/payment/verify-otp`,
         {
           email: paymentEmail,
           otp: otp.join(""),
@@ -212,14 +213,14 @@ const ViewResume = () => {
       setShowOtpModel(false);
 
       const { data } = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/payment/create-order",
+        `${API_URL}/payment/create-order`,
         {
           userId: user.id,
         }
       );
 
       const options = {
-        key: "rzp_test_THGu4hzb5NO39H",
+        key: RAZORPAY_KEY_ID,
         amount: data.order.amount,
         currency: data.order.currency,
         name: "InternArea",
@@ -229,7 +230,7 @@ const ViewResume = () => {
         handler: async function (response: any) {
           try {
             const verify = await axios.post(
-              "https://internshala-backend-5ycp.onrender.com/api/payment/verify-payment",
+              `${API_URL}/payment/verify-payment`,
               {
                 ...response,
                 userId: user.id,
@@ -240,7 +241,7 @@ const ViewResume = () => {
               toast.success("Payment Successful!");
 
               const res = await axios.get(
-                `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+                `${API_URL}/resume/${user.id}`
               );
 
               setResume(res.data.resume);
@@ -392,7 +393,7 @@ const ViewResume = () => {
             <div className="flex flex-col items-center mb-8">
               {resume.photo ? (
                 <img
-                  src={`https://internshala-backend-5ycp.onrender.com/uploads/profilePhoto/${resume.photo}`}
+                  src={`${BACKEND_URL}/uploads/profilePhoto/${resume.photo}`}
                   alt="Profile"
                   className="w-28 h-28 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-white shadow-xl"
                 />
