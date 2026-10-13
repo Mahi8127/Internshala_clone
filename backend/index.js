@@ -1,6 +1,10 @@
 const bodyparser = require("body-parser");
 const express = require("express");
 require("dotenv").config();
+const dns = require("dns");
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+}
 const path = require("path");
 
 const app = express();

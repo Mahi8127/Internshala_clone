@@ -121,11 +121,22 @@ const loginUser = async (req, res) => {
     }
 
     if (result.browser.name === "Chrome") {
+      const existing = loginOtpStore[user.email];
+      const now = Date.now();
+      if (existing && existing.lastSentAt && now - existing.lastSentAt < 60000) {
+        const remainingSec = Math.ceil((60000 - (now - existing.lastSentAt)) / 1000);
+        return res.status(429).json({
+          message: `Please wait ${remainingSec} seconds before requesting a new OTP.`,
+        });
+      }
+
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
       loginOtpStore[user.email] = {
         otp,
-        expires: Date.now() + 5 * 60 * 1000,
+        expires: now + 5 * 60 * 1000,
+        lastSentAt: now,
+        attempts: 0,
         user,
         browser,
         browserVersion,
@@ -228,6 +239,13 @@ const verifyLoginOtp = async (req, res) => {
     }
 
     if (otpData.otp !== otp) {
+      otpData.attempts = (otpData.attempts || 0) + 1;
+      if (otpData.attempts >= 5) {
+        delete loginOtpStore[email];
+        return res.status(400).json({
+          message: "Too many failed attempts. Please login again.",
+        });
+      }
       return res.status(400).json({
         message: "Invalid OTP.",
       });
@@ -493,12 +511,22 @@ const resendLoginOtp = async (req, res) => {
       });
     }
 
+    const now = Date.now();
+    if (otpData.lastSentAt && now - otpData.lastSentAt < 60000) {
+      const remainingSec = Math.ceil((60000 - (now - otpData.lastSentAt)) / 1000);
+      return res.status(429).json({
+        message: `Please wait ${remainingSec} seconds before requesting a new OTP.`,
+      });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     loginOtpStore[email] = {
       ...otpData,
       otp,
-      expires: Date.now() + 5 * 60 * 1000,
+      expires: now + 5 * 60 * 1000,
+      lastSentAt: now,
+      attempts: 0,
     };
 
     try {
