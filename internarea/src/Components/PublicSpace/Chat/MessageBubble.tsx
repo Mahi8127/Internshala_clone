@@ -2,8 +2,9 @@
 
 import React from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { BACKEND_URL } from "@/config/api";
 
-const API_URL = "https://internshala-backend-5ycp.onrender.com/";
+const API_URL = `${BACKEND_URL}/`;
 
 interface SharedPost {
   _id?: string;

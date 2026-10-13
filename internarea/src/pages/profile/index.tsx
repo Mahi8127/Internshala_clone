@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { BACKEND_URL } from "@/config/api";
 
 const Index = () => {
   const user = useSelector(selectuser);
@@ -30,7 +31,7 @@ const Index = () => {
 
       try {
         const response = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `${BACKEND_URL}/api/resume/${user.id}`
         );
 
         setResume(response.data.resume);

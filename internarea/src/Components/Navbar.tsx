@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectuser, logout } from "@/Feature/Userslice";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageOtpModal from "@/Components/LanguageOtpModal";
+import { BACKEND_URL } from "@/config/api";
 
 const Navbar = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -215,7 +216,7 @@ const Navbar = () => {
       setSendingLanguageOtp(true);
 
       const response = await fetch(
-        "https://internshala-backend-5ycp.onrender.com/api/language/send-otp",
+        `${BACKEND_URL}/api/language/send-otp`,
         {
           method: "POST",
           headers: {

@@ -20,6 +20,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { BACKEND_URL } from "@/config/api";
 
 const DetailItem = ({
   icon,
@@ -98,7 +99,7 @@ const index = () => {
     const fetchdata = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/job/${id}`
+          `${BACKEND_URL}/api/job/${id}`
         );
 
         setjob(res.data);
@@ -120,7 +121,7 @@ const index = () => {
     const fetchResume = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `${BACKEND_URL}/api/resume/${user.id}`
         );
 
         setResume(res.data.resume);
@@ -147,7 +148,7 @@ const index = () => {
     const fetchSubscription = async () => {
       try {
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
+          `${BACKEND_URL}/api/payment/subscription/${user.id}`
         );
 
         if (res.data.success) {
@@ -178,7 +179,7 @@ const index = () => {
   const handleApplyClick = () => {
     if (!user) {
       toast.error("Please login first to apply.");
-      setIsModelOpen(true);
+      router.push("/login");
       return;
     }
 
@@ -196,6 +197,7 @@ const index = () => {
   const handlesubmitapplication = async () => {
     if (!user) {
       toast.error("Please login first.");
+      router.push("/login");
       return;
     }
 
@@ -214,7 +216,8 @@ const index = () => {
     }
 
     if (!resume?.resumeUrl) {
-      toast.error("Please create/generate your resume first.");
+      toast.error("Please create or generate your resume first.");
+      router.push("/resume");
       return;
     }
 
@@ -242,7 +245,7 @@ const index = () => {
       };
 
       await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/application",
+        `${BACKEND_URL}/api/application`,
         applicationdata
       );
 
@@ -282,7 +285,7 @@ const index = () => {
         // Refresh subscription
         try {
           const res = await axios.get(
-            `https://internshala-backend-5ycp.onrender.com/api/payment/subscription/${user.id}`
+            `${BACKEND_URL}/api/payment/subscription/${user.id}`
           );
 
           if (res.data.success) {
@@ -670,7 +673,7 @@ const index = () => {
                         </div>
 
                         <a
-                          href={`https://internshala-backend-5ycp.onrender.com/uploads/resume/${resume.resumeUrl}`}
+                          href={`${BACKEND_URL}/uploads/resume/${resume.resumeUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"

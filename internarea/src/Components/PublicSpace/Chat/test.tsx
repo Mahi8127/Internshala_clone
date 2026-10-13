@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "@/config/api";
 // // 1.  chat
 // // 2,  conversation list
 // // 3. chatwindow
@@ -22,7 +23,7 @@
 // import MessageBubble from "./MessageBubble";
 // import MessageNotification from "./MessageNotification";
 
-// const API_URL = "https://internshala-backend-5ycp.onrender.com/";
+// const API_URL = `${BACKEND_URL}/`;
 
 // interface ChatProps {
 //   currentUserId: string;
@@ -1425,7 +1426,7 @@
 // import { ArrowLeft, MoreVertical, Send, MessageCircle } from "lucide-react";
 // import MessageBubble from "./MessageBubble";
 
-// const API_URL = "https://internshala-backend-5ycp.onrender.com/";
+// const API_URL = `${BACKEND_URL}/`;
 
 // interface User {
 //   _id: string;
@@ -1834,7 +1835,7 @@
 // import React, { useEffect, useState } from "react";
 // import { Search, MessageCircle } from "lucide-react";
 
-// const API_URL = "https://internshala-backend-5ycp.onrender.com/";
+// const API_URL = `${BACKEND_URL}/`;
 
 // interface User {
 //   _id: string;

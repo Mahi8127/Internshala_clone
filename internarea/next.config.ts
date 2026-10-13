@@ -11,6 +11,15 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+
+  async rewrites() {
+    return [
+      {
+        source: "/detailJob/:id*",
+        destination: "/detailjob/:id*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -14,6 +14,7 @@ import {
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+import { BACKEND_URL } from "@/config/api";
 
 const index = () => {
   const router = useRouter();
@@ -62,7 +63,7 @@ const index = () => {
       setisloading(true);
 
       await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/job",
+        `${BACKEND_URL}/api/job`,
         formData
       );
 

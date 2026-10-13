@@ -12,6 +12,7 @@ import {
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useLanguage } from "@/context/LanguageContext";
+import { BACKEND_URL } from "@/config/api";
 
 interface PostCardProps {
   post: any;
@@ -81,7 +82,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const mediaUrl = rawMediaUrl
     ? String(rawMediaUrl).startsWith("http")
       ? String(rawMediaUrl)
-      : `https://internshala-backend-5ycp.onrender.com/uploads/public/${String(rawMediaUrl).replace(
+      : `${BACKEND_URL}/uploads/public/${String(rawMediaUrl).replace(
           /^\/+/,
           "",
         )}`

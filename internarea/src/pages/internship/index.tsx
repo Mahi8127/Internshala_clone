@@ -15,11 +15,15 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { useLanguage } from "@/context/LanguageContext";
+import { BACKEND_URL } from "@/config/api";
 
 const Index = () => {
   const { t } = useLanguage();
   const [filteredInternship, setFilteredInternship] = useState<any[]>([]);
+  const [internshipData, setInternship] = useState<any[]>([]);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   const [filter, setFilters] = useState({
     category: "",
@@ -29,24 +33,28 @@ const Index = () => {
     stipend: 50,
   });
 
-  const [internshipData, setInternship] = useState<any[]>([]);
-
   /* ================= FETCH INTERNSHIPS ================= */
 
+  const fetchData = async () => {
+    setIsLoading(true);
+    setLoadError(false);
+    try {
+      const res = await axios.get(
+        `${BACKEND_URL}/api/internship`
+      );
+
+      const data = Array.isArray(res.data) ? res.data : [];
+      setInternship(data);
+      setFilteredInternship(data);
+    } catch (error) {
+      console.log(error);
+      setLoadError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          "https://internshala-backend-5ycp.onrender.com/api/internship"
-        );
-
-        setInternship(res.data);
-        setFilteredInternship(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -54,18 +62,18 @@ const Index = () => {
 
   useEffect(() => {
     const filtered = internshipData.filter((internship: any) => {
-      const category = internship.category || "";
-      const location = internship.location || "";
+      const category = (internship.category || "").toLowerCase();
+      const location = (internship.location || "").toLowerCase();
+      const title = (internship.title || "").toLowerCase();
+      const info = (internship.additionalInfo || "").toLowerCase();
+      const duration = (internship.duration || "").toLowerCase();
 
-      const matchesCategory = category
-        .toLowerCase()
-        .includes(filter.category.toLowerCase());
+      const matchesCategory = !filter.category || category.includes(filter.category.toLowerCase()) || title.includes(filter.category.toLowerCase());
+      const matchesLocation = !filter.location || location.includes(filter.location.toLowerCase());
+      const matchesWfh = !filter.workFromHome || (location.includes("work from home") || location.includes("remote") || title.includes("remote") || title.includes("work from home"));
+      const matchesPartTime = !filter.partTime || (title.includes("part") || duration.includes("part") || info.includes("part"));
 
-      const matchesLocation = location
-        .toLowerCase()
-        .includes(filter.location.toLowerCase());
-
-      return matchesCategory && matchesLocation;
+      return matchesCategory && matchesLocation && matchesWfh && matchesPartTime;
     });
 
     setFilteredInternship(filtered);
@@ -384,7 +392,45 @@ const Index = () => {
 
             <div className="space-y-4">
 
-              {filteredInternship.length > 0 ? (
+              {isLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((n) => (
+                    <div key={n} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm animate-pulse">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="h-6 w-1/3 bg-slate-200 rounded" />
+                        <div className="h-6 w-20 bg-slate-100 rounded-full" />
+                      </div>
+                      <div className="h-4 w-1/4 bg-slate-100 rounded mb-6" />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                        <div className="h-12 bg-slate-50 rounded-xl" />
+                        <div className="h-12 bg-slate-50 rounded-xl" />
+                        <div className="h-12 bg-slate-50 rounded-xl" />
+                      </div>
+                      <div className="flex justify-end">
+                        <div className="h-9 w-28 bg-slate-200 rounded-xl" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : loadError ? (
+                <div className="rounded-2xl border border-red-200 bg-white p-8 text-center shadow-sm">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500 mb-3">
+                    <Search size={24} />
+                  </div>
+                  <h3 className="text-base font-semibold text-slate-900">
+                    Failed to load internships
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500 max-w-md mx-auto">
+                    The backend service is taking longer than usual to respond. Please try again.
+                  </p>
+                  <button
+                    onClick={fetchData}
+                    className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : filteredInternship.length > 0 ? (
                 filteredInternship.map((internship: any) => (
 
                   <article

@@ -4,6 +4,7 @@ import { User, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import { BACKEND_URL } from "@/config/api";
 
 const AdminLogin = () => {
   const {t} = useLanguage()
@@ -37,7 +38,7 @@ const AdminLogin = () => {
     try {
       setisloading(true);
 
-      await axios.post("https://internshala-backend-5ycp.onrender.com/api/admin/adminlogin", formdata);
+      await axios.post(`${BACKEND_URL}/api/admin/adminlogin`, formdata);
 
       toast.success(t("adminlogin.loginSuccess"));
 

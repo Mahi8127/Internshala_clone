@@ -23,9 +23,9 @@ const getTransporter = () => {
         user: user.trim(),
         pass: cleanPass,
       },
-      connectionTimeout: 10000, // 10 seconds
-      greetingTimeout: 10000,   // 10 seconds
-      socketTimeout: 15000,     // 15 seconds
+      connectionTimeout: 20000, // 20 seconds for cold cloud containers
+      greetingTimeout: 20000,   // 20 seconds
+      socketTimeout: 30000,     // 30 seconds
     });
   }
   return transporter;
@@ -33,7 +33,8 @@ const getTransporter = () => {
 
 const sendEmail = async (to, subject, text, attachments = []) => {
   const mailTransporter = getTransporter();
-  const fromAddress = process.env.EMAIL || process.env.EMAIL_USER;
+  const rawUser = (process.env.EMAIL_USER || "").trim();
+  const fromAddress = process.env.EMAIL || (rawUser ? `"InternArea" <${rawUser}>` : undefined);
 
   try {
     const info = await mailTransporter.sendMail({

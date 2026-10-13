@@ -10,11 +10,14 @@ import {
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useLanguage } from "@/context/LanguageContext";
+import { BACKEND_URL } from "@/config/api";
 
 const Index = () => {
+  const router = useRouter();
   const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: "",
@@ -69,7 +72,7 @@ const Index = () => {
       setLoading(true);
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/register",
+        `${BACKEND_URL}/api/register`,
         {
           name: formData.name,
           email: formData.email,
@@ -87,6 +90,7 @@ const Index = () => {
         password: "",
         confirmpassword: "",
       });
+      router.push("/login");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error(

@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { BACKEND_URL } from "@/config/api";
 
 const getStatusColor = (status: string = "") => {
   switch (status.toLowerCase()) {
@@ -82,7 +83,7 @@ const UserApplication = () => {
     const fetchdata = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("https://internshala-backend-5ycp.onrender.com/api/application");
+        const res = await axios.get(`${BACKEND_URL}/api/application`);
         setData(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.log(error);
@@ -94,11 +95,12 @@ const UserApplication = () => {
   }, []);
 
   const userApplications = useMemo(() => {
-    if (!user?.name && !user?.email) return [];
+    if (!user?.name && !user?.email && !user?.id) return [];
     return data.filter(
       (app: any) =>
-        (user?.name && app.user?.name?.toLowerCase() === user.name.toLowerCase()) ||
-        (user?.email && app.user?.email?.toLowerCase() === user.email.toLowerCase())
+        (user?.id && (app.user?._id === user.id || app.user?.id === user.id)) ||
+        (user?.email && app.user?.email?.toLowerCase() === user.email.toLowerCase()) ||
+        (user?.name && app.user?.name?.toLowerCase() === user.name.toLowerCase())
     );
   }, [data, user]);
 

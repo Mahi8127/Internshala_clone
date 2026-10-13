@@ -13,6 +13,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { BACKEND_URL } from "@/config/api";
 
 const ChangePassword = () => {
   const user = useSelector(selectuser);
@@ -53,7 +54,7 @@ const ChangePassword = () => {
       setLoading(true);
 
       const response = await axios.put(
-        "https://internshala-backend-5ycp.onrender.com/api/change-password",
+        `${BACKEND_URL}/api/change-password`,
         {
           userId: user.id,
           currentPassword,

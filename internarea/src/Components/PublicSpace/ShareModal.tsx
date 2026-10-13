@@ -13,9 +13,10 @@ import {
 
 import toast from "react-hot-toast";
 import { useLanguage } from "@/context/LanguageContext";
+import { BACKEND_URL } from "@/config/api";
 
 const API_URL =
-  "https://internshala-backend-5ycp.onrender.com/";
+  `${BACKEND_URL}/`;
 
 interface User {
   _id: string;

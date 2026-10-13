@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { Mail, Phone, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { BACKEND_URL } from "@/config/api";
 
 export default function ForgotPassword() {
   const { t } = useLanguage();
@@ -24,7 +25,7 @@ export default function ForgotPassword() {
       setLoading(true);
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/forgot-password",
+        `${BACKEND_URL}/api/forgot-password`,
         {
           identifier: identifier.trim(),
         }

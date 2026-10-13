@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "@/firebase/firebase";
 import { useLanguage } from "@/context/LanguageContext";
+import { BACKEND_URL } from "@/config/api";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -44,7 +45,7 @@ const Index = () => {
       setLoading(true);
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/login",
+        `${BACKEND_URL}/api/login`,
         {
           identifier,
           password,
@@ -96,7 +97,7 @@ const Index = () => {
     try {
       setResendLoading(true);
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/resend-login-otp",
+        `${BACKEND_URL}/api/resend-login-otp`,
         {
           email,
         },
@@ -132,7 +133,7 @@ const Index = () => {
       };
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/google-login",
+        `${BACKEND_URL}/api/google-login`,
         googleUser,
         { timeout: 20000 }
       );
@@ -224,7 +225,7 @@ const Index = () => {
     try {
       setVerifyLoading(true);
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/verify-login-otp",
+        `${BACKEND_URL}/api/verify-login-otp`,
         {
           email,
           otp: otp.join(""),

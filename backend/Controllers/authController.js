@@ -1,3 +1,4 @@
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const UAParser = require("ua-parser-js");
@@ -47,12 +48,6 @@ const loginUser = async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
-    if (!identifier || !password) {
-      return res.status(400).json({
-        message: "Identifier and password are required",
-      });
-    }
-
     const user = await User.findOne({
       $or: [{ email: identifier }, { phone: identifier }],
     });
@@ -71,39 +66,42 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const uaString = req.headers["user-agent"] || "";
-    const parser = new UAParser(uaString);
+    const parser = new UAParser();
+    parser.setUA(req.headers["user-agent"]);
     const result = parser.getResult();
+
+    // DEBUG: Check what device the backend detects
+    console.log("USER AGENT:", req.headers["user-agent"]);
+    console.log("DEVICE DETECTED:", result.device);
 
     const browser = result.browser.name || "Unknown";
     const browserVersion = result.browser.version || "Unknown";
+
     const os = result.os.name || "Unknown";
     const osVersion = result.os.version || "Unknown";
 
     let deviceType = "Desktop";
+
     if (result.device.type === "mobile") {
       deviceType = "Mobile";
     } else if (result.device.type === "tablet") {
       deviceType = "Tablet";
     }
-
-    // Diagnostic logging without exposing sensitive data
-    console.log(`[AUTH] Login attempt - DeviceType: ${deviceType}, Browser: ${browser}, OS: ${os}`);
+    console.log("FINAL DEVICE TYPE:", deviceType);
+    console.log("CURRENT HOUR:", new Date().getHours());
 
     if (deviceType === "Mobile") {
-      // Calculate hour in Indian Standard Time (IST, UTC+5:30)
-      const istHour = parseInt(
-        new Intl.DateTimeFormat("en-US", {
-          timeZone: "Asia/Kolkata",
-          hour: "numeric",
-          hour12: false,
-        }).format(new Date()),
-        10
-      );
+      const now = new Date();
+      const indiaTime = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Kolkata",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).format(now);
 
-      console.log(`[AUTH] Mobile login check - IST Hour: ${istHour}`);
+      const [currentHour] = indiaTime.split(":").map(Number);
 
-      if (istHour < 10 || istHour >= 13) {
+      if (currentHour < 10 || currentHour >= 13) {
         return res.status(403).json({
           message: "Mobile login is allowed only between 10:00 AM and 1:00 PM.",
         });
@@ -111,6 +109,7 @@ const loginUser = async (req, res) => {
     }
 
     let deviceName = "Desktop";
+
     if (deviceType === "Mobile" || deviceType === "Tablet") {
       deviceName =
         `${result.device.vendor || ""} ${result.device.model || ""}`.trim();
@@ -190,7 +189,7 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("[AUTH] Login error:", error.message);
+    console.log(error);
 
     return res.status(500).json({
       message: "Server Error",
@@ -267,7 +266,7 @@ const verifyLoginOtp = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("[AUTH] Verify OTP error:", error.message);
+    console.log(error);
 
     return res.status(500).json({
       message: "Server Error",
@@ -295,7 +294,7 @@ const getLoginHistory = async (req, res) => {
       history,
     });
   } catch (error) {
-    console.error("[AUTH] Get login history error:", error.message);
+    console.log(error);
 
     return res.status(500).json({
       message: "Server Error",
@@ -420,7 +419,7 @@ Internship Portal Team`,
       message: "A new password has been sent to your registered email.",
     });
   } catch (error) {
-    console.error("[AUTH] Forgot password error:", error.message);
+    console.log(error);
 
     return res.status(500).json({
       message: "Server error",
@@ -464,7 +463,7 @@ const changePassword = async (req, res) => {
       message: "Password changed successfully",
     });
   } catch (error) {
-    console.error("[AUTH] Change password error:", error.message);
+    console.log(error);
 
     return res.status(500).json({
       message: "Server Error",
@@ -515,7 +514,7 @@ const resendLoginOtp = async (req, res) => {
       message: "OTP resent successfully",
     });
   } catch (error) {
-    console.error("[AUTH] Resend OTP error:", error.message);
+    console.log(error);
 
     return res.status(500).json({
       message: "Server Error",
@@ -527,12 +526,14 @@ const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("_id name photo").sort({ name: 1 });
 
+    console.log("USERS FOUND:", users);
+
     return res.status(200).json({
       success: true,
       users,
     });
   } catch (error) {
-    console.error("[AUTH] Get all users error:", error.message);
+    console.error("GET ALL USERS ERROR:", error);
 
     return res.status(500).json({
       success: false,

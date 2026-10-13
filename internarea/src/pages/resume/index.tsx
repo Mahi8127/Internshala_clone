@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { selectuser } from "@/Feature/Userslice";
+import { BACKEND_URL, RAZORPAY_KEY_ID } from "@/config/api";
 import {
   User,
   Briefcase,
@@ -327,7 +328,7 @@ const Resume = () => {
       }
 
       const response = await axios.post(
-        "https://internshala-backend-5ycp.onrender.com/api/resume",
+        `${BACKEND_URL}/api/resume`,
         data,
         {
           headers: {

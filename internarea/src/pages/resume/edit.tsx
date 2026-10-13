@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { selectuser } from "@/Feature/Userslice";
+import { BACKEND_URL } from "@/config/api";
 
 interface Education {
   college: string;
@@ -177,7 +178,7 @@ const Resume = () => {
         setLoading(true);
 
         const res = await axios.get(
-          `https://internshala-backend-5ycp.onrender.com/api/resume/${user.id}`
+          `${BACKEND_URL}/api/resume/${user.id}`
         );
 
         const resume = res.data.resume;
@@ -466,7 +467,7 @@ const Resume = () => {
       }
 
       const response = await axios.put(
-        `https://internshala-backend-5ycp.onrender.com/api/resume/${resumeId}`,
+        `${BACKEND_URL}/api/resume/${resumeId}`,
         data,
         {
           headers: {
@@ -492,7 +493,7 @@ const Resume = () => {
   const existingPhoto = useMemo(() => {
     if (!formData.photo) return "";
 
-    return `https://internshala-backend-5ycp.onrender.com/uploads/profilePhoto/${formData.photo}`;
+    return `${BACKEND_URL}/uploads/profilePhoto/${formData.photo}`;
   }, [formData.photo]);
 
   // --------------------------------------------------

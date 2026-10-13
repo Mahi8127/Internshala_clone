@@ -7,13 +7,32 @@ const Subscription = require("../Model/Subscription");
 
 const sendEmail = require("../Utils/sendEmail");
 const generateInvoice = require("../Utils/generateInvoice");
-const paymentOtpStore = require("../Utils/loginOtpStore");
+const paymentOtpStore = require("../Utils/paymentOtpStore");
 const subscriptionPlans = require("../Utils/subscriptionPlans");
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+let razorpayInstance = null;
+const getRazorpay = () => {
+  if (!razorpayInstance) {
+    const key_id = process.env.RAZORPAY_KEY_ID;
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!key_id || !key_secret) {
+      throw new Error("Razorpay credentials (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET) are missing.");
+    }
+    razorpayInstance = new Razorpay({ key_id, key_secret });
+  }
+  return razorpayInstance;
+};
+
+const razorpay = new Proxy(
+  {},
+  {
+    get: (target, prop) => {
+      const instance = getRazorpay();
+      const value = instance[prop];
+      return typeof value === "function" ? value.bind(instance) : value;
+    },
+  }
+);
 
 /* =========================================================
    PAYMENT TIME CHECK

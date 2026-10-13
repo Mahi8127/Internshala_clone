@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/config/api";
 
 interface Application {
   _id: string;
@@ -101,7 +102,7 @@ const Applications = () => {
         setLoading(true);
 
         const res = await axios.get(
-          "https://internshala-backend-5ycp.onrender.com/api/application"
+          `${BACKEND_URL}/api/application`
         );
 
         setData(Array.isArray(res.data) ? res.data : []);
@@ -174,7 +175,7 @@ const Applications = () => {
       setUpdatingId(id);
 
       const res = await axios.put(
-        `https://internshala-backend-5ycp.onrender.com/api/application/${id}`,
+        `${BACKEND_URL}/api/application/${id}`,
         { action }
       );
 

@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import axios from "axios";
 import { useLanguage } from "@/context/LanguageContext";
+import { BACKEND_URL } from "@/config/api";
 
 export default function SvgSlider() {
   const { t } = useLanguage();
@@ -63,25 +64,32 @@ export default function SvgSlider() {
   const [internships, setinternship] = useState<any[]>([]);
   const [jobs, setjob] = useState<any[]>([]);
   const [SlectedCategory, setSelectedCategory] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   // --------------------------------------------------
   // FETCH INTERNSHIPS + JOBS
   // --------------------------------------------------
+  const fetchdata = async () => {
+    setIsLoading(true);
+    setLoadError(false);
+    try {
+      const [internshipres, jobres] = await Promise.all([
+        axios.get(`${BACKEND_URL}/api/internship`),
+        axios.get(`${BACKEND_URL}/api/job`),
+      ]);
+
+      setinternship(Array.isArray(internshipres.data) ? internshipres.data : []);
+      setjob(Array.isArray(jobres.data) ? jobres.data : []);
+    } catch (error) {
+      console.log(error);
+      setLoadError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchdata = async () => {
-      try {
-        const [internshipres, jobres] = await Promise.all([
-          axios.get("https://internshala-backend-5ycp.onrender.com/api/internship"),
-          axios.get("https://internshala-backend-5ycp.onrender.com/api/job"),
-        ]);
-
-        setinternship(internshipres.data);
-        setjob(jobres.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchdata();
   }, []);
 
@@ -380,9 +388,16 @@ export default function SvgSlider() {
           viewAllText={t("home.sections.viewAll")}
         />
 
-        {filteredInternships.length > 0 ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mt-7">
-
+            <OpportunitySkeleton />
+            <OpportunitySkeleton />
+            <OpportunitySkeleton />
+          </div>
+        ) : loadError ? (
+          <ErrorState onRetry={fetchdata} />
+        ) : filteredInternships.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mt-7">
             {filteredInternships.map(
               (internship: any, index: number) => (
                 <OpportunityCard
@@ -397,7 +412,6 @@ export default function SvgSlider() {
                 />
               )
             )}
-
           </div>
         ) : (
           <EmptyState text={t("home.internships.empty")} />
@@ -418,9 +432,16 @@ export default function SvgSlider() {
           viewAllText={t("home.sections.viewAll")}
         />
 
-        {filteredJobs.length > 0 ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mt-7">
-
+            <OpportunitySkeleton />
+            <OpportunitySkeleton />
+            <OpportunitySkeleton />
+          </div>
+        ) : loadError ? (
+          <ErrorState onRetry={fetchdata} />
+        ) : filteredJobs.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mt-7">
             {filteredJobs.map((job: any, index: number) => (
               <OpportunityCard
                 key={job._id || index}
@@ -430,10 +451,9 @@ export default function SvgSlider() {
                 location={job.location}
                 amount={job.CTC}
                 secondary={job.Experience}
-                href={`/detailJob/${job._id}`}
+                href={`/detailjob/${job._id}`}
               />
             ))}
-
           </div>
         ) : (
           <EmptyState text={t("home.jobs.empty")} />
@@ -659,16 +679,56 @@ function DetailRow({
 function EmptyState({ text }: { text: string }) {
   return (
     <div className="mt-7 bg-white border border-dashed border-slate-300 rounded-2xl p-10 text-center">
-
       <Search
         size={32}
         className="mx-auto text-slate-300"
       />
-
       <p className="mt-3 text-slate-500">
         {text}
       </p>
+    </div>
+  );
+}
 
+function OpportunitySkeleton() {
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm animate-pulse">
+      <div className="flex items-center justify-between mb-5">
+        <div className="h-8 w-28 bg-slate-100 rounded-lg" />
+        <div className="h-6 w-16 bg-slate-100 rounded-full" />
+      </div>
+      <div className="h-6 w-3/4 bg-slate-200 rounded mb-2" />
+      <div className="h-4 w-1/2 bg-slate-100 rounded mb-5" />
+      <div className="space-y-3">
+        <div className="h-4 w-2/3 bg-slate-100 rounded" />
+        <div className="h-4 w-1/2 bg-slate-100 rounded" />
+        <div className="h-4 w-1/3 bg-slate-100 rounded" />
+      </div>
+      <div className="mt-6 pt-5 border-t border-slate-100 flex justify-end">
+        <div className="h-8 w-24 bg-slate-200 rounded-xl" />
+      </div>
+    </div>
+  );
+}
+
+function ErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="mt-7 bg-white border border-red-200 rounded-2xl p-8 text-center shadow-sm">
+      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-50 text-red-500 mb-3">
+        <Search size={22} />
+      </div>
+      <h3 className="text-base font-semibold text-slate-900">
+        Unable to load listings right now
+      </h3>
+      <p className="mt-1 text-sm text-slate-500 max-w-md mx-auto">
+        The server is taking longer than usual to respond. Please give it a moment to wake up and try again.
+      </p>
+      <button
+        onClick={onRetry}
+        className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition"
+      >
+        Retry Loading
+      </button>
     </div>
   );
 }
