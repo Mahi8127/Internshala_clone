@@ -43,21 +43,20 @@ router.post("/resend-login-otp", resendLoginOtp);
 const sendEmail = require("../Utils/sendEmail");
 
 router.get("/email-status", (req, res) => {
-  const provider = typeof sendEmail.getProvider === "function" ? sendEmail.getProvider() : "unknown";
-  let configured = false;
-  if (provider === "brevo") {
-    configured = Boolean(process.env.BREVO_API_KEY && process.env.BREVO_API_KEY.trim());
-  } else if (provider === "resend") {
-    configured = Boolean(process.env.RESEND_API_KEY && process.env.RESEND_API_KEY.trim());
-  } else if (provider === "smtp") {
-    configured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
-  }
+  const config =
+    typeof sendEmail.getSmtpConfig === "function"
+      ? sendEmail.getSmtpConfig()
+      : null;
+
   return res.status(200).json({
     status: "ok",
-    provider,
-    configured,
-    smtpHost: provider === "smtp" ? (process.env.SMTP_HOST || "smtp.gmail.com") : undefined,
-    smtpPort: provider === "smtp" ? parseInt(process.env.SMTP_PORT || "465", 10) : undefined,
+    provider: "smtp",
+    service: "gmail",
+    configured: config ? config.configured : Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS),
+    smtpHost: config ? config.host : (process.env.SMTP_HOST || "smtp.gmail.com"),
+    smtpPort: config ? config.port : parseInt(process.env.SMTP_PORT || "465", 10),
+    secure: config ? config.secure : true,
+    ipv4Forced: true,
   });
 });
 
