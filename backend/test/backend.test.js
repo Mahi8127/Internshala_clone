@@ -57,7 +57,26 @@ describe("Internshala Backend Automated Test Suite", () => {
       res.headers.get("access-control-allow-credentials"),
       "true"
     );
+
+    // Test live Vercel production origin
+    const vercelRes = await fetch(`${baseUrl}/api/register`, {
+      method: "OPTIONS",
+      headers: {
+        Origin: "https://internshala-clone-rho.vercel.app",
+        "Access-Control-Request-Method": "POST",
+      },
+    });
+    assert.strictEqual(vercelRes.status, 204);
+    assert.strictEqual(
+      vercelRes.headers.get("access-control-allow-origin"),
+      "https://internshala-clone-rho.vercel.app"
+    );
+    assert.strictEqual(
+      vercelRes.headers.get("access-control-allow-credentials"),
+      "true"
+    );
   });
+
 
   test("3. Admin Login route verifies valid and invalid credentials", async () => {
     // Valid admin login
@@ -112,7 +131,23 @@ describe("Internshala Backend Automated Test Suite", () => {
   });
 
   test("6. Auth controller validations and error contracts", async () => {
-    // Missing identifier login
+    // Missing fields in registration
+    const registerMissingRes = await fetch(`${baseUrl}/api/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    assert.strictEqual(registerMissingRes.status, 400);
+
+    // Missing fields in login
+    const loginEmptyRes = await fetch(`${baseUrl}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    assert.strictEqual(loginEmptyRes.status, 400);
+
+    // Non-existent user login
     const loginMissingRes = await fetch(`${baseUrl}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

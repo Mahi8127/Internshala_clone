@@ -78,6 +78,8 @@ const Index = () => {
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
           toast.error("Request timed out. The server is taking longer than usual to respond. Please try again.");
+        } else if (!error.response) {
+          toast.error("Unable to connect to backend server. Please check CORS or server status.");
         } else {
           toast.error(
             error.response?.data?.message || t("auth.login.loginFailed")

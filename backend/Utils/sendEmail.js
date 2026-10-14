@@ -1,5 +1,11 @@
+const dns = require("dns");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+
+// Enforce IPv4-first DNS resolution across this process to eliminate IPv6 ENETUNREACH errors in container environments like Render
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 let transporter = null;
 
@@ -19,6 +25,7 @@ const getTransporter = () => {
       host: "smtp.gmail.com",
       port: 465,
       secure: true, // Use SSL directly
+      family: 4,    // Force IPv4 socket connection to eliminate container IPv6 timeouts
       auth: {
         user: user.trim(),
         pass: cleanPass,

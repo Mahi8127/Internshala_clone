@@ -93,10 +93,14 @@ const Index = () => {
       router.push("/login");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message ||
-            t("auth.register.somethingWrong")
-        );
+        if (!error.response) {
+          toast.error("Unable to connect to backend server. Please check CORS or server status.");
+        } else {
+          toast.error(
+            error.response?.data?.message ||
+              t("auth.register.somethingWrong")
+          );
+        }
       } else {
         toast.error(t("auth.register.somethingWrong"));
       }

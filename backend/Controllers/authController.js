@@ -13,6 +13,12 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
 
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "Name, email, and password are required",
+      });
+    }
+
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -36,7 +42,7 @@ const registerUser = async (req, res) => {
       message: "Registration successful",
     });
   } catch (error) {
-    console.error(error);
+    console.error("[AUTH] Registration error:", error.message);
 
     res.status(500).json({
       message: "Server Error",
@@ -47,6 +53,12 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { identifier, password } = req.body;
+
+    if (!identifier || !password) {
+      return res.status(400).json({
+        message: "Email/Phone and password are required",
+      });
+    }
 
     const user = await User.findOne({
       $or: [{ email: identifier }, { phone: identifier }],
